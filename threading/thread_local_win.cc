@@ -15,7 +15,7 @@ namespace internal {
 // static
 void ThreadLocalPlatform::AllocateSlot(SlotType& slot) {
   slot = TlsAlloc();
-  assert(slot == TLS_OUT_OF_INDEXES);
+  assert(slot != TLS_OUT_OF_INDEXES);
 }
 
 // static

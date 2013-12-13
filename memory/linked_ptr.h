@@ -38,7 +38,7 @@
 #define BASE_MEMORY_LINKED_PTR_H_
 #pragma once
 
-#include <cassert>
+#include <assert.h>
 
 // This is used internally by all instances of linked_ptr<>.  It needs to be
 // a non-template class because different types of linked_ptr<> can refer to

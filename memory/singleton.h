@@ -231,7 +231,7 @@ class Singleton {
     base::subtle::AtomicWord value = base::subtle::NoBarrier_Load(&instance_);
     if (value != 0 && value != base::internal::kBeingCreatedMarker) {
       // See the corresponding HAPPENS_BEFORE below.
-      ANNOTATE_HAPPENS_AFTER(&instance_);
+      //ANNOTATE_HAPPENS_AFTER(&instance_);
       return reinterpret_cast<Type*>(value);
     }
 
@@ -246,7 +246,7 @@ class Singleton {
       // This annotation helps race detectors recognize correct lock-less
       // synchronization between different threads calling get().
       // See the corresponding HAPPENS_AFTER below and above.
-      ANNOTATE_HAPPENS_BEFORE(&instance_);
+      //ANNOTATE_HAPPENS_BEFORE(&instance_);
       base::subtle::Release_Store(
           &instance_, reinterpret_cast<base::subtle::AtomicWord>(newval));
 

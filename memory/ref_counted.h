@@ -6,7 +6,7 @@
 #define BASE_MEMORY_REF_COUNTED_H_
 #pragma once
 
-#include <cassert>
+#include <assert.h>
 
 #include "base/atomic_ref_count.h"
 #include "base/base_export.h"
