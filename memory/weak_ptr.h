@@ -61,7 +61,7 @@
 
 #include "base/basictypes.h"
 #include "base/base_export.h"
-#include <cassert>
+#include <assert.h>
 #include "base/memory/ref_counted.h"
 #include "base/template_util.h"
 #include "base/threading/thread_checker.h"
@@ -206,11 +206,11 @@ class WeakPtr : public internal::WeakPtrBase {
   operator T*() const { return get(); }
 
   T& operator*() const {
-    DCHECK(get() != NULL);
+    assert(get() != NULL);
     return *get();
   }
   T* operator->() const {
-    DCHECK(get() != NULL);
+    assert(get() != NULL);
     return get();
   }
 
@@ -295,25 +295,25 @@ class WeakPtrFactory {
   }
 
   WeakPtr<T> GetWeakPtr() {
-    DCHECK(ptr_);
+    assert(ptr_);
     return WeakPtr<T>(weak_reference_owner_.GetRef(), ptr_);
   }
 
   // Call this method to invalidate all existing weak pointers.
   void InvalidateWeakPtrs() {
-    DCHECK(ptr_);
+    assert(ptr_);
     weak_reference_owner_.Invalidate();
   }
 
   // Call this method to determine if any weak pointers exist.
   bool HasWeakPtrs() const {
-    DCHECK(ptr_);
+    assert(ptr_);
     return weak_reference_owner_.HasRefs();
   }
 
   // Indicates that this object will be used on another thread from now on.
   void DetachFromThread() {
-    DCHECK(ptr_);
+    assert(ptr_);
     weak_reference_owner_.DetachFromThread();
   }
 

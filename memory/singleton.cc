@@ -21,7 +21,11 @@ subtle::AtomicWord WaitForInstance(subtle::AtomicWord* instance) {
     value = subtle::NoBarrier_Load(instance);
     if (value != kBeingCreatedMarker)
       break;
-   //> PlatformThread::YieldCurrentThread();
+#if 0
+    PlatformThread::YieldCurrentThread();
+#else
+    ::Sleep(0);
+#endif
   }
   return value;
 }

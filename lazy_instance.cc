@@ -30,7 +30,11 @@ bool NeedsLazyInstance(subtle::AtomicWord* state) {
   // the associated data (buf_). Pairing Release_Store is in
   // CompleteLazyInstance().
   while (subtle::Acquire_Load(state) == kLazyInstanceStateCreating) {
-   //> PlatformThread::YieldCurrentThread();
+#if 0
+    PlatformThread::YieldCurrentThread();
+#else
+    ::Sleep(0);
+#endif
   }
   // Someone else created the instance.
   return false;
