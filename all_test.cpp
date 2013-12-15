@@ -1,3 +1,6 @@
+#include <sstream>
+#include <iostream>
+
 #include "base\memory\singleton.h"
 #include "base\at_exit.h"
 #include "base\compiler_specific.h"
@@ -9,13 +12,12 @@
 #include "base\float_util.h"
 #include "base\lazy_instance.h"
 #include "base\tuple.h"
-#include <iostream>
-#include <string>
 #include "base\template_util.h"
 #include "base\observer_list.h"
 #include "base\memory\aligned_memory.h"
 #include "base\observer_list_threadsafe.h"
- 
+#include "base\memory\mru_cache.h"
+
 class SingletonTest {
 public:
   SingletonTest() {}
@@ -194,4 +196,18 @@ UNIT_TEST(ObserverListTest) {
    observer->Notify("ObserverListTest");
    observer->RemoveObserver(test.get());
 }
+//////////////////////////////////////////////////////////////////////////
+UNIT_TEST(HashingMRUCache) {
+  size_t max_size = 10;
+  base::MRUCache<int, char> mru_cache(max_size);
+  int key = 0;
+  char playload = 'a';
 
+  for(int i = 0; i < max_size; i ++) {
+    mru_cache.Put(key + i, playload + i);
+  }
+
+  assert(mru_cache.begin()->first == 9  && mru_cache.begin()->second == 'a' + 9);
+  assert(mru_cache.Get(9)->first == 9   && mru_cache.Get(9)->second == 'a' + 9); 
+  assert(mru_cache.begin()->first == 9  && mru_cache.begin()->second == 'a' + 9);
+}

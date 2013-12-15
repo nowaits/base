@@ -20,10 +20,10 @@
 #include <list>
 #include <map>
 #include <utility>
+#include <assert.h>
 
 #include "base/basictypes.h"
 #include "base/hash_tables.h"
-#include "base/logging.h"
 
 namespace base {
 
@@ -170,7 +170,7 @@ class MRUCacheBase {
   size_type size() const {
     // We don't use ordering_.size() for the return value because
     // (as a linked list) it can be O(n).
-    DCHECK(index_.size() == ordering_.size());
+    assert(index_.size() == ordering_.size());
     return index_.size();
   }
 

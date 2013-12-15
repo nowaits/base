@@ -24,8 +24,6 @@
 
 #include "build/build_config.h"
 
-#include "base/string16.h"
-
 #if defined(COMPILER_MSVC)
 #include <hash_map>
 #include <hash_set>
