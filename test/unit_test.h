@@ -1,7 +1,7 @@
 /*
 简单的测试模板
 用法：
-TEST(test_case_name) {
+UNIT_TEST(test_case_name) {
 .....
 }
 */
@@ -48,7 +48,7 @@ private:
 
 #define RUN_ALL_TEST() TestList<TestBase>::GetInstance()->Run()
 
-#define TEST(test_case_name)\
+#define UNIT_TEST(test_case_name)\
 class test_case_name##_Test : public TestBase {\
 public:\
   test_case_name##_Test() {;\

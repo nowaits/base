@@ -4,7 +4,7 @@
 #include "base\memory\weak_ptr.h"
 #include "base\bind.h"
 #include "bind_helpers.h"
-#include "base\test\test_all.h"
+#include "base\test\unit_test.h"
 #include "base\bits.h"
 #include "base\float_util.h"
 #include "base\lazy_instance.h"
@@ -53,7 +53,7 @@ private:
   base::WeakPtrFactory<WeakPtrTest> weak_ref_;
 };
 
-TEST(SingletonTest) {
+UNIT_TEST(SingletonTest) {
   SingletonTest* t = SingletonTest::GetInstance();
 }
 
@@ -66,7 +66,7 @@ private:
   char data[79];
 };
 
-TEST(POD) {
+UNIT_TEST(POD) {
   //   1.POD数据类型
   //     2.内存对齐
   ALIGNAS(4096) uint8 data;
@@ -85,7 +85,7 @@ TEST(POD) {
     my_class.data_as<PODClass>()->PODClass::~PODClass();
 }
 
-TEST(WeakPtrTest) {
+UNIT_TEST(WeakPtrTest) {
   scoped_ptr<WeakPtrTest> ptr(new WeakPtrTest);
 
   base::Callback<int()> call_back = 
@@ -95,7 +95,7 @@ TEST(WeakPtrTest) {
   assert(call_back.Run() == 32);
 }
 
-TEST(Log2Floor) {
+UNIT_TEST(Log2Floor) {
   uint32 x = 800;
   int log_2_f = base::bits::Log2Floor(x);
   int log_2_c = base::bits::Log2Ceiling(x);
@@ -105,7 +105,7 @@ TEST(Log2Floor) {
   assert(result <= x && x <= result<<1);
 }
 
-TEST(IsFinite) {
+UNIT_TEST(IsFinite) {
   assert(base::IsFinite(0));
 }
 
@@ -114,7 +114,7 @@ struct NULLStruct{
   ~NULLStruct(){}
 };
 
-TEST(LazyInstance) {
+UNIT_TEST(LazyInstance) {
   
   base::LazyInstance<NULLStruct>::Leaky my_leaky_lazy_instance = LAZY_INSTANCE_INITIALIZER;
 
@@ -133,12 +133,12 @@ struct Tuple_Class{
   }
 };
 
-TEST(Tuple) {
+UNIT_TEST(Tuple) {
   Tuple_Class t;
   DispatchToMethod(&t, &Tuple_Class::SomeMeth, MakeTuple(1, std::string("ddd")));  DispatchToFunction(&Tuple_Class::Method, MakeTuple(1, std::string("ddd")));
 }
 
-TEST(is_class) {
+UNIT_TEST(is_class) {
   const bool a = base::is_class<NULLStruct>::value;
   const bool b = base::is_class<char>::value;
   assert(a == true);
@@ -174,7 +174,7 @@ public:
       std::cout<<s<<std::endl;
     }
 };
-TEST(ObserverListTest) {
+UNIT_TEST(ObserverListTest) {
    scoped_ptr<ObserverListTest> observer(new ObserverListTest);
    scoped_ptr<ObserverTest> test(new ObserverTest);
    observer->AddObserver(test.get());
