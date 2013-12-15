@@ -24,6 +24,7 @@ public:
   PODClass(int x = 100, std::string text = "pod")
     : x_(x), text_(text){}
   ~PODClass(){}
+  const std::string& text(){return text_;}
 private:
   int x_;
   std::string text_;
@@ -32,8 +33,9 @@ private:
 UNIT_TEST(placement_new) {
   uint8 data[sizeof(PODClass)] = {0};
 
-  PODClass* pod =  new(data) PODClass(20, __FUNCDNAME__);
+  PODClass* pod =  new(data) PODClass(20, "data");
   
+  assert(pod->text() == "data");
   pod->PODClass::~PODClass();
 
   assert(sizeof(*pod) == sizeof(PODClass));
