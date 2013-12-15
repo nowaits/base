@@ -14,6 +14,7 @@
 #include "base\template_util.h"
 #include "base\observer_list.h"
 #include "base\memory\aligned_memory.h"
+#include "base\observer_list_threadsafe.h"
  
 class SingletonTest {
 public:
@@ -25,6 +26,11 @@ public:
   };
 };
 
+UNIT_TEST(SingletonTest) {
+  SingletonTest* t = SingletonTest::GetInstance();
+}
+
+//////////////////////////////////////////////////////////////////////////
 class WeakPtrTest {
 public:
   WeakPtrTest() : weak_ref_(this){}
@@ -53,10 +59,6 @@ private:
   base::WeakPtrFactory<WeakPtrTest> weak_ref_;
 };
 
-UNIT_TEST(SingletonTest) {
-  SingletonTest* t = SingletonTest::GetInstance();
-}
-
 class PODClass {
 public:
   PODClass(): x(100){}
@@ -66,6 +68,17 @@ private:
   char data[79];
 };
 
+UNIT_TEST(WeakPtrTest) {
+  scoped_ptr<WeakPtrTest> ptr(new WeakPtrTest);
+
+  base::Callback<int()> call_back = 
+    base::Bind(&WeakPtrTest::WeakFun, ptr->AsWeakPtr(), 32);
+  assert(call_back.Run() != 32);
+  ptr.reset();
+  assert(call_back.Run() == 32);
+}
+
+//////////////////////////////////////////////////////////////////////////
 UNIT_TEST(POD) {
   //   1.POD数据类型
   //     2.内存对齐
@@ -84,17 +97,7 @@ UNIT_TEST(POD) {
     // ... later, to destruct my_class:
     my_class.data_as<PODClass>()->PODClass::~PODClass();
 }
-
-UNIT_TEST(WeakPtrTest) {
-  scoped_ptr<WeakPtrTest> ptr(new WeakPtrTest);
-
-  base::Callback<int()> call_back = 
-    base::Bind(&WeakPtrTest::WeakFun, ptr->AsWeakPtr(), 32);
-  assert(call_back.Run() != 32);
-  ptr.reset();
-  assert(call_back.Run() == 32);
-}
-
+//////////////////////////////////////////////////////////////////////////
 UNIT_TEST(Log2Floor) {
   uint32 x = 800;
   int log_2_f = base::bits::Log2Floor(x);
@@ -109,10 +112,18 @@ UNIT_TEST(IsFinite) {
   assert(base::IsFinite(0));
 }
 
+//////////////////////////////////////////////////////////////////////////
 struct NULLStruct{
   NULLStruct(){}
   ~NULLStruct(){}
 };
+
+UNIT_TEST(is_class) {
+  const bool a = base::is_class<NULLStruct>::value;
+  const bool b = base::is_class<char>::value;
+  assert(a == true);
+  assert(b == false);
+}
 
 UNIT_TEST(LazyInstance) {
   
@@ -123,7 +134,7 @@ UNIT_TEST(LazyInstance) {
 
   assert(!(my_leaky_lazy_instance == NULL)); 
 }
-
+//////////////////////////////////////////////////////////////////////////
 struct Tuple_Class{ 
   void SomeMeth(int a, std::string s) {
     std::cout<<s<<std::endl;
@@ -137,14 +148,7 @@ UNIT_TEST(Tuple) {
   Tuple_Class t;
   DispatchToMethod(&t, &Tuple_Class::SomeMeth, MakeTuple(1, std::string("ddd")));  DispatchToFunction(&Tuple_Class::Method, MakeTuple(1, std::string("ddd")));
 }
-
-UNIT_TEST(is_class) {
-  const bool a = base::is_class<NULLStruct>::value;
-  const bool b = base::is_class<char>::value;
-  assert(a == true);
-  assert(b == false);
-}
-
+//////////////////////////////////////////////////////////////////////////
 class ObserverListTest{
 public:
   class Observer {
@@ -174,11 +178,20 @@ public:
       std::cout<<s<<std::endl;
     }
 };
+
+UNIT_TEST(ObserverListThreadSafe) {
+  ObserverListThreadSafe<ObserverTest>* s = new ObserverListThreadSafe<ObserverTest>;
+  scoped_ptr<ObserverTest> test(new ObserverTest);
+  s->AddObserver(test.get());
+  s->Notify(&ObserverListTest::Observer::OnFoo, std::string("ObserverListThreadSafe"));
+  int x = 200;
+}
+
 UNIT_TEST(ObserverListTest) {
    scoped_ptr<ObserverListTest> observer(new ObserverListTest);
    scoped_ptr<ObserverTest> test(new ObserverTest);
    observer->AddObserver(test.get());
-   observer->Notify("dddd");
+   observer->Notify("ObserverListTest");
    observer->RemoveObserver(test.get());
-
 }
+

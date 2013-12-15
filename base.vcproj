@@ -203,14 +203,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\memory\scoped_open_process.h"
-				>
-			</File>
-			<File
-				RelativePath=".\memory\scoped_policy.h"
-				>
-			</File>
-			<File
 				RelativePath=".\memory\scoped_ptr.h"
 				>
 			</File>
