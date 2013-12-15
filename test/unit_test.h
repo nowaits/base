@@ -8,12 +8,36 @@ UNIT_TEST(test_case_name) {
 
 #pragma once
 #include <list>
-
+//////////////////////////////////////////////////////////////////////////
 class UnitCase {
 public:
   virtual ~UnitCase() {};
   virtual void TestBody() = 0;
 };
+
+#define GTEST_DISALLOW_COPY_AND_ASSIGN(type)\
+  type(const type &);\
+  void operator=(const type &)
+
+#define RUN_ALL_TEST() ::UnitList<UnitCase>::GetInstance()->Run()
+
+#define UNIT_TEST(unit_case_name)\
+class unit_case_name##_Test : public UnitCase {\
+public:\
+  unit_case_name##_Test() {;\
+  ::UnitList<UnitCase>::GetInstance()->Add(this);\
+}\
+  ~unit_case_name##_Test() {;\
+  ::UnitList<UnitCase>::GetInstance()->Remove(this);\
+}\
+  virtual void TestBody();\
+private:\
+  static const unit_case_name##_Test* test_init_;\
+  GTEST_DISALLOW_COPY_AND_ASSIGN(unit_case_name##_Test);\
+};\
+  const unit_case_name##_Test* unit_case_name##_Test::test_init_ \
+  = new unit_case_name##_Test;\
+  void unit_case_name##_Test::TestBody()
 
 template <typename T>
 class UnitList {
@@ -56,27 +80,3 @@ public:
 private:
   std::list<T*> list_;
 };
-
-#define GTEST_DISALLOW_COPY_AND_ASSIGN(type)\
-  type(const type &);\
-  void operator=(const type &)
-
-#define RUN_ALL_TEST() ::UnitList<UnitCase>::GetInstance()->Run()
-
-#define UNIT_TEST(unit_case_name)\
-class unit_case_name##_Test : public UnitCase {\
-public:\
-  unit_case_name##_Test() {;\
-  ::UnitList<UnitCase>::GetInstance()->Add(this);\
-}\
-  ~unit_case_name##_Test() {;\
-  ::UnitList<UnitCase>::GetInstance()->Remove(this);\
-}\
-  virtual void TestBody();\
-private:\
-  static const unit_case_name##_Test* test_init_;\
-  GTEST_DISALLOW_COPY_AND_ASSIGN(unit_case_name##_Test);\
-};\
-  const unit_case_name##_Test* unit_case_name##_Test::test_init_ \
-  = new unit_case_name##_Test;\
-  void unit_case_name##_Test::TestBody()
