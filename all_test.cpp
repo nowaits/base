@@ -18,6 +18,46 @@
 #include "base\observer_list_threadsafe.h"
 #include "base\memory\mru_cache.h"
 
+//////////////////////////////////////////////////////////////////////////
+class PODClass {
+public:
+  PODClass(int x = 100, std::string text = "pod")
+    : x_(x), text_(text){}
+  ~PODClass(){}
+private:
+  int x_;
+  std::string text_;
+};
+
+UNIT_TEST(placement_new) {
+  uint8 data[sizeof(PODClass)] = {0};
+
+  PODClass* pod =  new(data) PODClass(20, __FUNCDNAME__);
+  
+  pod->PODClass::~PODClass();
+
+  assert(sizeof(*pod) == sizeof(PODClass));
+}
+
+UNIT_TEST(POD) {
+  //   1.POD数据类型
+  //     2.内存对齐
+  ALIGNAS(4096) uint8 data;
+  assert(((int)&data & (int)(4096 - 1)) == 0);
+
+  static base::AlignedMemory<sizeof(PODClass), ALIGNOF(PODClass)> my_class;
+
+  assert((reinterpret_cast<uintptr_t>(my_class.void_data()) & (ALIGNOF(PODClass) - 1)) ==  0u);
+  // ... at runtime:
+  new(my_class.void_data()) PODClass;
+
+  // ... use it:
+  PODClass* mc = my_class.data_as<PODClass>();
+
+  // ... later, to destruct my_class:
+  my_class.data_as<PODClass>()->PODClass::~PODClass();
+}
+//////////////////////////////////////////////////////////////////////////
 class SingletonTest {
 public:
   SingletonTest() {}
@@ -60,15 +100,7 @@ public:
 private:
   base::WeakPtrFactory<WeakPtrTest> weak_ref_;
 };
-
-class PODClass {
-public:
-  PODClass(): x(100){}
-  ~PODClass(){}
-private:
-  int x;
-  char data[79];
-};
+//////////////////////////////////////////////////////////////////////////
 
 UNIT_TEST(WeakPtrTest) {
   scoped_ptr<WeakPtrTest> ptr(new WeakPtrTest);
@@ -80,25 +112,6 @@ UNIT_TEST(WeakPtrTest) {
   assert(call_back.Run() == 32);
 }
 
-//////////////////////////////////////////////////////////////////////////
-UNIT_TEST(POD) {
-  //   1.POD数据类型
-  //     2.内存对齐
-  ALIGNAS(4096) uint8 data;
-  assert(((int)&data & (int)(4096 - 1)) == 0);
-
-  static base::AlignedMemory<sizeof(PODClass), ALIGNOF(PODClass)> my_class;
-
-  assert((reinterpret_cast<uintptr_t>(my_class.void_data()) & (ALIGNOF(PODClass) - 1)) ==  0u);
-    // ... at runtime:
-    new(my_class.void_data()) PODClass;
- 
-    // ... use it:
-    PODClass* mc = my_class.data_as<PODClass>();
- 
-    // ... later, to destruct my_class:
-    my_class.data_as<PODClass>()->PODClass::~PODClass();
-}
 //////////////////////////////////////////////////////////////////////////
 UNIT_TEST(Log2Floor) {
   uint32 x = 800;
