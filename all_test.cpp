@@ -1,3 +1,17 @@
+// UNIT_TEST(placement_new)
+// UNIT_TEST(POD)
+// UNIT_TEST(SingletonTest)
+// UNIT_TEST(WeakPtrTest)
+// UNIT_TEST(Log2Floor)
+// UNIT_TEST(IsFinite)
+// UNIT_TEST(is_class)
+// UNIT_TEST(LazyInstance)
+// UNIT_TEST(Tuple)
+// UNIT_TEST(ObserverListThreadSafe)
+// UNIT_TEST(ObserverListTest)
+// UNIT_TEST(HashingMRUCache) 
+// UNIT_TEST(ThreadLocalPointerTest)
+// UNIT_TEST(LinkedList)
 #include <sstream>
 #include <iostream>
 
@@ -114,7 +128,6 @@ public:
 private:
   base::WeakPtrFactory<WeakPtrTest> weak_ref_;
 };
-//////////////////////////////////////////////////////////////////////////
 
 UNIT_TEST(WeakPtrTest) {
   scoped_ptr<WeakPtrTest> ptr(new WeakPtrTest);
@@ -271,14 +284,9 @@ class LinkNodeTest
   : public base::LinkNode<LinkNodeTest> {
 public:
   LinkNodeTest(const std::string& text): text_(text) {}
-  ~LinkNodeTest(){
-
-    RemoveFromList();
-  }
+  ~LinkNodeTest(){RemoveFromList();}
   const std::string& text(){return text_;}
   std::string& text()const {static std::string s;return s;}
-
-  //base::LinkNode<LinkNodeTest>* node()const{return NULL;}
 private:
   std::string text_;
 };
