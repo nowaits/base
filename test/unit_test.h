@@ -9,16 +9,20 @@ UNIT_TEST(test_case_name) {
 #pragma once
 #include <list>
 
-class TestBase {
+class UnitCase {
 public:
+  virtual ~UnitCase() {};
   virtual void TestBody() = 0;
 };
 
 template <typename T>
-class TestList {
+class UnitList {
 public:
-  static TestList<T>* GetInstance() {
-    static TestList<T> instance;
+  UnitList(){}
+  ~UnitList(){ Clear(); }
+
+  static UnitList<T>* GetInstance() {
+    static UnitList<T> instance;
     return &instance;
   }
 
@@ -29,6 +33,7 @@ public:
   void Remove(T* test_body) {
     list_.remove(test_body);
   }
+
   void Run() {
     std::list<T*>::const_iterator it  = list_.begin();
     std::list<T*>::const_iterator end = list_.end();
@@ -36,6 +41,16 @@ public:
     while(it != end) {
       (*it)->TestBody();
       it ++;
+    }
+  }
+
+  void Clear() {
+    std::list<T*>::const_iterator it  = list_.begin();
+    std::list<T*>::const_iterator end = list_.end();
+
+    while(it != end) {
+      delete *it;
+      it  = list_.begin();
     }
   }
 private:
@@ -46,21 +61,22 @@ private:
   type(const type &);\
   void operator=(const type &)
 
-#define RUN_ALL_TEST() TestList<TestBase>::GetInstance()->Run()
+#define RUN_ALL_TEST() ::UnitList<UnitCase>::GetInstance()->Run()
 
-#define UNIT_TEST(test_case_name)\
-class test_case_name##_Test : public TestBase {\
+#define UNIT_TEST(unit_case_name)\
+class unit_case_name##_Test : public UnitCase {\
 public:\
-  test_case_name##_Test() {;\
-  TestList<TestBase>::GetInstance()->Add(this);\
+  unit_case_name##_Test() {;\
+  ::UnitList<UnitCase>::GetInstance()->Add(this);\
 }\
-  ~test_case_name##_Test() {;\
-  TestList<TestBase>::GetInstance()->Remove(this);\
+  ~unit_case_name##_Test() {;\
+  ::UnitList<UnitCase>::GetInstance()->Remove(this);\
 }\
   virtual void TestBody();\
 private:\
-  static const test_case_name##_Test test_init_;\
-  GTEST_DISALLOW_COPY_AND_ASSIGN(test_case_name##_Test);\
+  static const unit_case_name##_Test* test_init_;\
+  GTEST_DISALLOW_COPY_AND_ASSIGN(unit_case_name##_Test);\
 };\
-  const test_case_name##_Test test_case_name##_Test::test_init_;\
-  void test_case_name##_Test::TestBody()
+  const unit_case_name##_Test* unit_case_name##_Test::test_init_ \
+  = new unit_case_name##_Test;\
+  void unit_case_name##_Test::TestBody()
