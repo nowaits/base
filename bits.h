@@ -9,7 +9,7 @@
 #pragma once
 
 #include "base/basictypes.h"
-#include "base/logging.h"
+#include <assert.h>
 
 namespace base {
 namespace bits {
@@ -28,7 +28,7 @@ inline int Log2Floor(uint32 n) {
       log += shift;
     }
   }
-  DCHECK_EQ(value, 1u);
+  assert(value == 1u);
   return log;
 }
 

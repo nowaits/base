@@ -9,9 +9,9 @@
 #include <algorithm>
 #include <limits>
 #include <vector>
+#include <assert.h>
 
 #include "base/basictypes.h"
-#include "base/logging.h"
 #include "base/memory/weak_ptr.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -84,7 +84,7 @@ class ObserverListBase
         : list_(list.AsWeakPtr()),
           index_(0),
           max_index_(list.type_ == NOTIFY_ALL ?
-                     std::numeric_limits<size_t>::max() :
+                     std::numeric_limits<size_t>::max():
                      list.observers_.size()) {
       ++list_->notify_depth_;
     }
@@ -99,7 +99,7 @@ class ObserverListBase
         return NULL;
       ListType& observers = list_->observers_;
       // Advance if the current element is null
-      size_t max_index = std::min(max_index_, observers.size());
+      size_t max_index = std::min<size_t>(max_index_, observers.size());
       while (index_ < max_index && !observers[index_])
         ++index_;
       return index_ < max_index ? observers[index_++] : NULL;
@@ -120,7 +120,7 @@ class ObserverListBase
   void AddObserver(ObserverType* obs) {
     if (std::find(observers_.begin(), observers_.end(), obs)
         != observers_.end()) {
-      NOTREACHED() << "Observers can only be added once!";
+      assert(("Observers can only be added once!", false));
       return;
     }
     observers_.push_back(obs);
@@ -195,7 +195,7 @@ class ObserverList : public ObserverListBase<ObserverType> {
     // When check_empty is true, assert that the list is empty on destruction.
     if (check_empty) {
       ObserverListBase<ObserverType>::Compact();
-      DCHECK_EQ(ObserverListBase<ObserverType>::size(), 0U);
+      assert(ObserverListBase<ObserverType>::size() == 0U);
     }
   }
 

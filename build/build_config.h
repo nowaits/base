@@ -150,39 +150,4 @@
 #define ENABLE_MEDIA_TYPE_OGG 1 
 #define ENABLE_MEDIA_CODEC_THEORA 1 
 
-
-// LIEBAO_PUBLIC_BUILD 定义公开版本和内部版本
-// !!!! 使用 OFFICIAL_BUILD 来进行判断
-//   1 表示公开版本
-//   0 表示内部版本
-#define LIEBAO_PUBLIC_BUILD 1
-
-// 该宏定义是否trunk 版本(荣誉团版本) 
-//  荣誉团版本可以开启一些调试代码, 比如 XCHECK 
-#define LIEBAO_INTERNAL_BUILD 1
-
-
-#if LIEBAO_PUBLIC_BUILD
-  // 公开版本 
-  #ifndef _DEBUG
-    #define OFFICIAL_BUILD 1
-  #endif
-
-#else
-  // 内部版本
-  #ifdef OFFICIAL_BUILD
-    #undef OFFICIAL_BUILD
-  #endif 
-  #define OFFICIAL_BUILD 0
-
-#endif 
-
-
-
-#ifdef _DEBUG
-  #define ENABLE_CHROME_FEATURE_ 1
-#else
-  #define ENABLE_CHROME_FEATURE_ 0
-#endif 
-
 #endif  // BUILD_BUILD_CONFIG_H_
