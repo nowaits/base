@@ -105,8 +105,19 @@ class LinkNode {
 
   // Remove |this| from the linked list.
   void RemoveFromList() {
-    this->previous_->next_ = this->next_;
-    this->next_->previous_ = this->previous_;
+
+    if (this->previous_ != NULL && this->next_ != NULL) {
+
+      if (this->previous_ == this->next_) {
+        this->previous_->next_ = this->previous_->previous_ = 0;
+      }
+      else {
+        this->previous_->next_ = this->next_;
+        this->next_->previous_ = this->previous_;
+      }
+
+      this->previous_ = this->next_ = 0;
+    }
   }
 
   LinkNode<T>* previous() const {
@@ -122,9 +133,9 @@ class LinkNode {
     return static_cast<const T*>(this);
   }
 
-  T* value() {
-    return static_cast<T*>(this);
-  }
+   T* value() {
+     return static_cast<T*>(this);
+   }
 
   // Work around a Clang bug reported upstream:
   //   http://llvm.org/bugs/show_bug.cgi?id=7974

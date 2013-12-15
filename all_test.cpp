@@ -17,6 +17,9 @@
 #include "base\memory\aligned_memory.h"
 #include "base\observer_list_threadsafe.h"
 #include "base\memory\mru_cache.h"
+#include "base\atomic_sequence_num.h"
+#include "base\threading\thread_local.h"
+#include "base\linked_list.h"
 
 //////////////////////////////////////////////////////////////////////////
 class PODClass {
@@ -34,7 +37,7 @@ UNIT_TEST(placement_new) {
   uint8 data[sizeof(PODClass)] = {0};
 
   PODClass* pod =  new(data) PODClass(20, "data");
-  
+
   assert(pod->text() == "data");
   pod->PODClass::~PODClass();
 
@@ -57,7 +60,8 @@ UNIT_TEST(POD) {
   PODClass* mc = my_class.data_as<PODClass>();
 
   // ... later, to destruct my_class:
-  my_class.data_as<PODClass>()->PODClass::~PODClass();
+  my_class.data_as<PODClass>()->PODClass::~PODClass();
+
 }
 //////////////////////////////////////////////////////////////////////////
 class SingletonTest {
@@ -68,10 +72,18 @@ public:
   static SingletonTest* GetInstance(){
     return Singleton<SingletonTest>::get();
   };
+
+  int GetNext() {    return member_.GetNext();  }
+private:
+  base::AtomicSequenceNumber   member_;
 };
 
 UNIT_TEST(SingletonTest) {
   SingletonTest* t = SingletonTest::GetInstance();
+  assert(t->GetNext() == 0);
+  assert(t->GetNext() == 1);
+  assert(t->GetNext() == 2);
+  assert(t->GetNext() == 3);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -126,7 +138,7 @@ UNIT_TEST(Log2Floor) {
 }
 
 UNIT_TEST(IsFinite) {
-  assert(base::IsFinite(0));
+  assert(base::IsFinite(std::numeric_limits<double>::max()));
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -143,7 +155,7 @@ UNIT_TEST(is_class) {
 }
 
 UNIT_TEST(LazyInstance) {
-  
+
   base::LazyInstance<NULLStruct>::Leaky my_leaky_lazy_instance = LAZY_INSTANCE_INITIALIZER;
 
   assert(my_leaky_lazy_instance == NULL);
@@ -163,7 +175,8 @@ struct Tuple_Class{
 
 UNIT_TEST(Tuple) {
   Tuple_Class t;
-  DispatchToMethod(&t, &Tuple_Class::SomeMeth, MakeTuple(1, std::string("ddd")));  DispatchToFunction(&Tuple_Class::Method, MakeTuple(1, std::string("ddd")));
+  DispatchToMethod(&t, &Tuple_Class::SomeMeth, MakeTuple(1, std::string("ddd")));
+  DispatchToFunction(&Tuple_Class::Method, MakeTuple(1, std::string("ddd")));
 }
 //////////////////////////////////////////////////////////////////////////
 class ObserverListTest{
@@ -172,18 +185,15 @@ public:
   public:
     virtual void OnFoo(const std::string& s) = 0;
   };
-
   void AddObserver(Observer* obs) {
     observer_list_.AddObserver(obs);
   }
-
   void RemoveObserver(Observer* obs) {
     observer_list_.RemoveObserver(obs);
   }
   void Notify(const std::string& s) {
     FOR_EACH_OBSERVER(Observer, observer_list_, OnFoo(s));
   }
-
 private:
   ObserverList<Observer> observer_list_;
 };
@@ -191,9 +201,9 @@ private:
 class ObserverTest 
   : public ObserverListTest::Observer {
 public:
-    virtual void OnFoo(const std::string& s) override {
-      std::cout<<s<<std::endl;
-    }
+  virtual void OnFoo(const std::string& s) override {
+    std::cout<<s<<std::endl;
+  }
 };
 
 UNIT_TEST(ObserverListThreadSafe) {
@@ -205,11 +215,11 @@ UNIT_TEST(ObserverListThreadSafe) {
 }
 
 UNIT_TEST(ObserverListTest) {
-   scoped_ptr<ObserverListTest> observer(new ObserverListTest);
-   scoped_ptr<ObserverTest> test(new ObserverTest);
-   observer->AddObserver(test.get());
-   observer->Notify("ObserverListTest");
-   observer->RemoveObserver(test.get());
+  scoped_ptr<ObserverListTest> observer(new ObserverListTest);
+  scoped_ptr<ObserverTest> test(new ObserverTest);
+  observer->AddObserver(test.get());
+  observer->Notify("ObserverListTest");
+  observer->RemoveObserver(test.get());
 }
 //////////////////////////////////////////////////////////////////////////
 UNIT_TEST(HashingMRUCache) {
@@ -225,4 +235,79 @@ UNIT_TEST(HashingMRUCache) {
   assert(mru_cache.begin()->first == 9  && mru_cache.begin()->second == 'a' + 9);
   assert(mru_cache.Get(9)->first == 9   && mru_cache.Get(9)->second == 'a' + 9); 
   assert(mru_cache.begin()->first == 9  && mru_cache.begin()->second == 'a' + 9);
+}
+//////////////////////////////////////////////////////////////////////////
+template <typename T>
+class ThreadLocalPointerTest : public base::ThreadLocalPointer<T> {
+public:
+  static ThreadLocalPointerTest<T>* GetInstance(){
+    return Singleton<ThreadLocalPointerTest<T>>::get();
+  }
+};
+class TestClass {
+public:
+  TestClass::TestClass() {
+    ThreadLocalPointerTest<TestClass>::GetInstance()->Set(this);
+  }
+  TestClass::~TestClass() {
+    ThreadLocalPointerTest<TestClass>::GetInstance()->Set(NULL);
+  }
+  static TestClass* TestClass::current() {
+    return ThreadLocalPointerTest<TestClass>::GetInstance()->Get();
+  }
+};
+
+UNIT_TEST(ThreadLocalPointerTest) {
+  assert(TestClass::current() == NULL);
+  {
+    scoped_ptr<TestClass> t(new TestClass);
+    assert(TestClass::current() == t.get());
+  }
+  assert(TestClass::current() == NULL);
+}
+
+//////////////////////////////////////////////////////////////////////////
+class LinkNodeTest
+  : public base::LinkNode<LinkNodeTest> {
+public:
+  LinkNodeTest(const std::string& text): text_(text) {}
+  ~LinkNodeTest(){
+
+    RemoveFromList();
+  }
+  const std::string& text(){return text_;}
+  std::string& text()const {static std::string s;return s;}
+
+  //base::LinkNode<LinkNodeTest>* node()const{return NULL;}
+private:
+  std::string text_;
+};
+
+UNIT_TEST(LinkedList) {
+
+  base::LinkedList<LinkNodeTest> list;
+  { 
+    scoped_ptr<LinkNodeTest> n1(new LinkNodeTest("aaa"));
+    scoped_ptr<LinkNodeTest> n2(new LinkNodeTest("bbb"));
+    scoped_ptr<LinkNodeTest> n3(new LinkNodeTest("ccc"));
+
+    list.Append(n1.get());
+    list.Append(n3.get());
+    n2->InsertBefore(n3.get());
+
+    for (base::LinkNode<LinkNodeTest>* node = list.head();
+      node != list.end();
+      node = node->next()) {
+        std::cout<<node->value()->text()<<std::endl;
+    }
+
+    for (base::LinkNode<LinkNodeTest>* node = list.tail();
+      node != list.end();
+      node = node->previous()) {
+        std::cout<<node->value()->text()<<std::endl;
+    }
+  }
+
+  assert(list.head()->value() == 0);
+  assert(list.head() == 0 && list.tail() == 0);
 }
