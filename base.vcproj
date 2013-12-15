@@ -292,19 +292,7 @@
 			>
 		</File>
 		<File
-			RelativePath=".\atomicops_internals_arm_gcc.h"
-			>
-		</File>
-		<File
 			RelativePath=".\atomicops_internals_atomicword_compat.h"
-			>
-		</File>
-		<File
-			RelativePath=".\atomicops_internals_mips_gcc.h"
-			>
-		</File>
-		<File
-			RelativePath=".\atomicops_internals_x86_macosx.h"
 			>
 		</File>
 		<File
@@ -377,10 +365,6 @@
 		</File>
 		<File
 			RelativePath=".\float_util.h"
-			>
-		</File>
-		<File
-			RelativePath=".\format_macros.h"
 			>
 		</File>
 		<File
