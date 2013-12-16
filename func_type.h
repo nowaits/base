@@ -72,11 +72,15 @@ class FunType{
 
   template<typename OBJ, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
   static MFunc7& Check(R(OBJ::*)(T1, T2, T3, T4, T5, T6, T7));
+
+private:
+  static const int check_type     = sizeof(Check(*v));
+
 public:
-  static const int invalid_value = -1;
-  static const bool value       = sizeof(Check(*v)) != sizeof(InvalidType);
-  static const bool is_obj_fun  = sizeof(Check(*v)) >= sizeof(MFunc0) && sizeof(Check(*v)) <= sizeof(MFunc7);
-  static const int arg_num      = !value ? invalid_value : sizeof(Check(*v)) - (is_obj_fun ? sizeof(MFunc0) : sizeof(GFunc0));
+  static const int invalid_value  = -1;
+  static const bool value         = check_type != sizeof(InvalidType);
+  static const bool is_obj_fun    = check_type >= sizeof(MFunc0) && check_type <= sizeof(MFunc7);
+  static const int arg_num        = !value ? invalid_value : check_type - (is_obj_fun ? sizeof(MFunc0) : sizeof(GFunc0));
 };
 
 template<typename R = void>
