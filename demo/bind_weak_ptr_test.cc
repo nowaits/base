@@ -57,3 +57,15 @@ UNIT_TEST(WeakPtrTestModify) {
 
   call_back.Run();
 }
+
+typedef char aa[1];
+typedef char bb[2];
+typedef char cc[3];
+
+
+int f(){return 0;};
+int x;
+UNIT_TEST(temp) {
+  COMPILE_ASSERT(IS_RET_TYPE_OK(&f, x), ok);
+  COMPILE_ASSERT(IS_RET_TYPE_OK(&WeakPtrTest::WeakCallBackTestA, x), ok);
+}

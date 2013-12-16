@@ -1,7 +1,6 @@
 // UNIT_TEST(placement_new)
 // UNIT_TEST(POD)
 // UNIT_TEST(SingletonTest)
-// UNIT_TEST(WeakPtrTest)
 // UNIT_TEST(Log2Floor)
 // UNIT_TEST(IsFinite)
 // UNIT_TEST(is_class)
@@ -100,45 +99,6 @@ UNIT_TEST(SingletonTest) {
   assert(t->GetNext() == 1);
   assert(t->GetNext() == 2);
   assert(t->GetNext() == 3);
-}
-
-//////////////////////////////////////////////////////////////////////////
-class WeakPtrTest {
-public:
-  WeakPtrTest() : weak_ref_(this){}
-
-  ~WeakPtrTest(){}
-
-  base::WeakPtr<WeakPtrTest> AsWeakPtr() { 
-    return weak_ref_.GetWeakPtr();
-  }
-
-  int WeakCallBackTestA() {
-    return 43;
-  }
-
-  static int WeakFun(base::WeakPtr<WeakPtrTest> weak, int default){
-    if (weak.get())
-      return weak->WeakCallBackTestA();
-    else 
-      return default;
-  }
-
-  void WeakCallBackTestB() {
-    return;
-  }
-private:
-  base::WeakPtrFactory<WeakPtrTest> weak_ref_;
-};
-
-UNIT_TEST(WeakPtrTest) {
-  scoped_ptr<WeakPtrTest> ptr(new WeakPtrTest);
-
-  base::Callback<int()> call_back = 
-    base::Bind(&WeakPtrTest::WeakFun, ptr->AsWeakPtr(), 32);
-  assert(call_back.Run() != 32);
-  ptr.reset();
-  assert(call_back.Run() == 32);
 }
 
 //////////////////////////////////////////////////////////////////////////
