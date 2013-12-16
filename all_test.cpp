@@ -34,6 +34,8 @@
 #include "base\atomic_sequence_num.h"
 #include "base\threading\thread_local.h"
 #include "base\linked_list.h"
+#include "func_type.h"
+#include "func_type_v.h"
 
 //////////////////////////////////////////////////////////////////////////
 class PODClass {
@@ -185,12 +187,38 @@ struct Tuple_Class{
     std::cout<<s<<std::endl;
   }
 };
+#if 0
+
+template<typename F, typename TUPLE, typename OBJ>
+void DisplatchMethod(F fun, TUPLE tuple, OBJ obj = NULL) {
+  COMPILE_ASSERT(IS_OBJ_FUN(fun) == true, sdfsfd);
+  if (IS_OBJ_FUN(fun)){
+    if (obj == NULL) {return;}
+    DispatchToMethod(obj, fun, tuple);
+  }
+  else {
+    DispatchToFunction(fun, tuple);
+  }
+}
 
 UNIT_TEST(Tuple) {
   Tuple_Class t;
-  DispatchToMethod(&t, &Tuple_Class::SomeMeth, MakeTuple(1, std::string("ddd")));
+  int x = 1;
+  
+  DisplatchMethod(&Tuple_Class::SomeMeth, MakeTuple(x, std::string("ddd")), &t);
+}
+#else
+UNIT_TEST(Tuple) {
+  Tuple_Class t;
+  int x = 1;
+  COMPILE_ASSERT(IS_OBJ_FUN(&Tuple_Class::SomeMeth) == true, sdfsfd);
+  COMPILE_ASSERT(IS_OBJ_FUN(&Tuple_Class::Method) == false, sdfsfd);
+  if (FuncTypeDetect<>::IsObjFunction(&Tuple_Class::SomeMeth))
+    DispatchToMethod(&t, &Tuple_Class::SomeMeth, MakeTuple(1, std::string("ddd")));
+  else
   DispatchToFunction(&Tuple_Class::Method, MakeTuple(1, std::string("ddd")));
 }
+#endif
 //////////////////////////////////////////////////////////////////////////
 class ObserverListTest{
 public:

@@ -2,6 +2,8 @@
 #include "base\test\unit_test.h"
 #include <string>
 #include <assert.h>
+#include "base\basictypes.h"
+#include "base\func_type_v.h"
 
 void fun(){*((char*)0) = 0;}
 void funa(int){*((char*)0) = 0;}
@@ -51,4 +53,17 @@ UNIT_TEST(OBJ_FUN) {
   assert(FuncTypeDetect<bool>::check(sss::funb, true, true, false, 1));
   assert(FuncTypeDetect<bool&>::check(sss::TestClass::funa, true, true, false, 3));
   assert(FuncTypeDetect<bool>::check(&sss::TestClass::funb, true, true, true, 3));
+}
+
+template<typename T> 
+void Obj_fun(const T& t) {
+  COMPILE_ASSERT(IS_VOID_TYPE(t), you_need_suply_a_default_result);
+}
+
+template<typename T1, typename T2> 
+void Obj_fun(const T1& t, const T2&) {
+}
+
+UNIT_TEST(BIND_FUN_TEST) {
+  Obj_fun(fun1, 32);
 }

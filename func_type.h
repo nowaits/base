@@ -49,7 +49,7 @@ class FunType{
   static GFunc7& Check(R(*)(T1, T2, T3, T4, T5, T6, T7));
 
   // member function
-  template<typename OBJ, typename T1>
+  template<typename OBJ>
   static MFunc0& Check(R(OBJ::*)());
 
   template<typename OBJ, typename T1>
