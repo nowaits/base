@@ -180,6 +180,18 @@
 			<File
 				RelativePath=".\demo\all_test.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\demo\bind_weak_ptr_test.cc"
+				>
 			</File>
 			<File
 				RelativePath=".\demo\func_test.cc"
