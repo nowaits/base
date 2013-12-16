@@ -7,72 +7,60 @@ UNIT_TEST(test_case_name) {
 */
 
 #pragma once
-#include <list>
+#include <queue>
 //////////////////////////////////////////////////////////////////////////
 #define GTEST_DISALLOW_COPY_AND_ASSIGN(type)\
   type(const type &);\
   void operator=(const type &)
 
-class UnitCase {
+class Unitqueue {
 public:
-  virtual ~UnitCase() {};
-  virtual void TestBody() = 0;
-};
+  class Delegate {
+  public:
+    virtual ~Delegate() {};
+    virtual void TestBody() = 0;
+  };
 
-template <typename T>
-class UnitList {
-public:
-  UnitList(){}
-  ~UnitList(){ Clear(); }
+  Unitqueue(){}
+  ~Unitqueue(){ Clear(); }
 
-  static UnitList<T>* GetInstance() {
-    static UnitList<T> instance;
+  static Unitqueue* GetInstance() {
+    static Unitqueue instance;
     return &instance;
   }
 
-  void Add(T* test_body) {
-    list_.push_back(test_body);
-  }
-
-  void Remove(T* test_body) {
-    list_.remove(test_body);
+  void push(Delegate* test_body) {
+    unit_queque_.push(test_body);
   }
 
   void Run() {
-    std::list<T*>::const_iterator it  = list_.begin();
-    std::list<T*>::const_iterator end = list_.end();
+    while (!unit_queque_.empty()) {
+      unit_queque_.front()->TestBody();
+      delete unit_queque_.front();
 
-    while(it != end) {
-      (*it)->TestBody();
-      it ++;
+      unit_queque_.pop();
     }
   }
 
   void Clear() {
-    std::list<T*>::const_iterator it  = list_.begin();
-    std::list<T*>::const_iterator end = list_.end();
-
-    while(it != end) {
-      delete *it;
-      it  = list_.begin();
+    while (!unit_queque_.empty()) {
+      delete unit_queque_.front();
+      unit_queque_.pop();
     }
   }
 private:
-  std::list<T*> list_;
+  std::queue<Delegate*> unit_queque_;
 
-  GTEST_DISALLOW_COPY_AND_ASSIGN(UnitList<T>);
+  GTEST_DISALLOW_COPY_AND_ASSIGN(Unitqueue);
 };
 
-#define RUN_ALL_TEST() ::UnitList<UnitCase>::GetInstance()->Run()
+#define RUN_ALL_TEST() ::Unitqueue::GetInstance()->Run()
 
 #define UNIT_TEST(unit_case_name)\
-class unit_case_name##_Test : public UnitCase {\
+class unit_case_name##_Test : public Unitqueue::Delegate {\
 public:\
   unit_case_name##_Test() {;\
-  ::UnitList<UnitCase>::GetInstance()->Add(this);\
-}\
-  ~unit_case_name##_Test() {;\
-  ::UnitList<UnitCase>::GetInstance()->Remove(this);\
+  ::Unitqueue::GetInstance()->push(this);\
 }\
   virtual void TestBody();\
 private:\
