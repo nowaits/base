@@ -3,12 +3,6 @@
 #include <string>
 #include <assert.h>
 
-class TestClass {
-public:
-  static void funa(){};
-  void funb(){};
-};
-
 void fun(){*((char*)0) = 0;}
 void funa(int){*((char*)0) = 0;}
 void funaa(std::string){*((char*)0) = 0;}
@@ -25,33 +19,36 @@ bool funee(int, std::string){*((char*)0) = 0;return 0;}
 bool funf(int, int, int){*((char*)0) = 0;return 0;}
 bool funff(std::string, std::string, int){*((char*)0) = 0;return 0;}
 
-typedef char Type1[1];
-typedef char Type2[2];
+namespace sss {
+  class TestClass {
+  public:
+    static bool& funa(int a, std::string d, int & y){static bool x;return x;};
+    bool funb(int a, std::string d, int & y){return 0;};
+  };
 
-Type1& Check(...);
-Type2& Check(void(*)());
+  void funa(int){}
+  bool funb(int){return 0;}
+}
 
-UNIT_TEST(funtype) {
+UNIT_TEST(OBJ_FUN) {
+  assert(FuncTypeDetect<>::check(fun, true, true, false, 0));
+  assert(FuncTypeDetect<>::check(funa, true, true, false, 1));
+  assert(FuncTypeDetect<>::check(funaa, true, true, false, 1));
+  assert(FuncTypeDetect<>::check(funb, true, true, false, 2));
+  assert(FuncTypeDetect<>::check(funbb, true, true, false, 2));
+  assert(FuncTypeDetect<>::check(func, true, true, false, 3));
+  assert(FuncTypeDetect<>::check(funcc, true, true, false, 3));
 
-  const bool a = IsVoidFun(fun);
-  const int  aa = FunArgNum(fun);
-  const bool b = IsVoidFun(funb);
-  const int  bb = FunArgNum(funb);
-  const bool c = IsVoidFun(funcc);
-  const int  cc = FunArgNum(funcc);
+  assert(FuncTypeDetect<int>::check(fun1, true, true, false, 0));
+  assert(FuncTypeDetect<bool>::check(fund, true, true, false, 1));
+  assert(FuncTypeDetect<bool>::check(fundd, true, true, false, 1));
+  assert(FuncTypeDetect<bool>::check(fune, true, true, false, 2));
+  assert(FuncTypeDetect<bool>::check(funee, true, true, false, 2));
+  assert(FuncTypeDetect<bool>::check(funf, true, true, false, 3));
+  assert(FuncTypeDetect<bool>::check(funff, true, true, false, 3));
 
-  const int cdd = IsVoidFun(fun);
-  const int d = IsVoidFun(fun1);
-
-  const int e = sizeof(Check(fun));
-  const int f = sizeof(Check(fun1));
-
-  const bool g = FuncTypeDect<>::IsVoidFun(fun);
-  const bool h = FuncTypeDect<int>::IsVoidFun(funff);
-  const bool j = FuncTypeDect<bool>::IsVoidFun(funff);
-
-  assert(FuncTypeDect<>::IsVoidFun(fun) == true && FuncTypeDect<>::FunArgNum(fun) == 0);
-  assert(FuncTypeDect<>::IsFunction(a) == false);
-  assert(FuncTypeDect<int>::IsVoidFun(funff) == false);
-  assert(FuncTypeDect<bool>::IsVoidFun(funff) == true && FuncTypeDect<bool>::FunArgNum(funff) == 3);
+  assert(FuncTypeDetect<>::check(sss::funa, true, true, false, 1));
+  assert(FuncTypeDetect<bool>::check(sss::funb, true, true, false, 1));
+  assert(FuncTypeDetect<bool&>::check(sss::TestClass::funa, true, true, false, 3));
+  assert(FuncTypeDetect<bool>::check(&sss::TestClass::funb, true, true, true, 3));
 }
