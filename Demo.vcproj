@@ -178,15 +178,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\all_test.cpp"
+				RelativePath=".\demo\all_test.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\func_test.cc"
+				RelativePath=".\demo\func_test.cc"
 				>
 			</File>
 			<File
-				RelativePath=".\main.cpp"
+				RelativePath=".\demo\main.cpp"
 				>
 			</File>
 		</Filter>

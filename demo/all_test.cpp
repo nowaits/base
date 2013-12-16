@@ -20,7 +20,7 @@
 #include "base\compiler_specific.h"
 #include "base\memory\weak_ptr.h"
 #include "base\bind.h"
-#include "bind_helpers.h"
+#include "base\bind_helpers.h"
 #include "base\test\unit_test.h"
 #include "base\bits.h"
 #include "base\float_util.h"
@@ -34,8 +34,8 @@
 #include "base\atomic_sequence_num.h"
 #include "base\threading\thread_local.h"
 #include "base\linked_list.h"
-#include "func_type.h"
-#include "func_type_v.h"
+#include "base\func_type.h"
+#include "base\func_type_v.h"
 
 //////////////////////////////////////////////////////////////////////////
 class PODClass {
