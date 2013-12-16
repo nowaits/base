@@ -182,6 +182,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\func_test.cc"
+				>
+			</File>
+			<File
 				RelativePath=".\main.cpp"
 				>
 			</File>
@@ -191,6 +195,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\func_type_v.h"
+				>
+			</File>
 			<File
 				RelativePath=".\test\unit_test.h"
 				>
