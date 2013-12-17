@@ -30,6 +30,7 @@ typedef char MFunc4[44];
 typedef char MFunc5[45];
 typedef char MFunc6[46];
 typedef char MFunc7[47];
+
 typedef char MFunc00[60];
 typedef char MFunc01[61];
 typedef char MFunc02[62];
