@@ -138,18 +138,6 @@ static MFunc06& Check(void(OBJ::*)(T1, T2, T3, T4, T5, T6));
 template<typename OBJ, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
 static MFunc07& Check(void(OBJ::*)(T1, T2, T3, T4, T5, T6, T7));
 
-typedef char No[1];
-typedef char Yes[2];
-
-template <typename A, typename B>
-No& RetTypeCheck(A, B);
-
-template <typename A>
-Yes& RetTypeCheck(A(*)(), A);
-
-template <typename A, typename B>
-Yes& RetTypeCheck(A(B::*)(), A);
-
 #define CHECK_TYPE(fun) sizeof(Check(fun))
 
 #define IS_VOID_TYPE(fun) (\
@@ -166,5 +154,3 @@ Yes& RetTypeCheck(A(B::*)(), A);
   CHECK_TYPE(fun) >= sizeof(MFunc0) && CHECK_TYPE(fun) <= sizeof(MFunc7) ? CHECK_TYPE(fun) - sizeof(MFunc0) : (\
   CHECK_TYPE(fun) >= sizeof(MFunc00) && CHECK_TYPE(fun) <= sizeof(MFunc07) ? CHECK_TYPE(fun) - sizeof(MFunc00) : \
   -1)
-
-#define IS_RET_TYPE_OK(fun, x) (sizeof(RetTypeCheck(fun, x)) == sizeof(Yes))

@@ -1,9 +1,9 @@
-#include "base\func_type.h"
 #include "base\test\unit_test.h"
 #include <string>
 #include <assert.h>
 #include "base\basictypes.h"
-#include "base\func_type_v.h"
+#include "base\function_type\func_type.h"
+#include "base\function_type\common_feature.h"
 
 void fun(){*((char*)0) = 0;}
 void funa(int){*((char*)0) = 0;}
