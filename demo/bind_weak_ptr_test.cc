@@ -2,9 +2,7 @@
 #include "base\memory\weak_ptr.h"
 #include "base\test\unit_test.h"
 #include "base\basictypes.h"
-#include "base\function_type\ret_type_math.h"
-#include "base\function_type\request_value.h"
-#include "base\function_type\common_feature.h"
+#include "base\function_type\type.h"
 
 // UNIT_TEST(WeakPtrTest)
 class WeakPtrTest {

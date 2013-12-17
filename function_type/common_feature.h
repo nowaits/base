@@ -1,4 +1,6 @@
 #pragma once
+namespace function_type {
+
 typedef char InvalidType[1];
 
 //sizeof(type)
@@ -138,19 +140,4 @@ static MFunc06& Check(void(OBJ::*)(T1, T2, T3, T4, T5, T6));
 template<typename OBJ, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
 static MFunc07& Check(void(OBJ::*)(T1, T2, T3, T4, T5, T6, T7));
 
-#define CHECK_TYPE(fun) sizeof(Check(fun))
-
-#define IS_VOID_TYPE(fun) (\
-  CHECK_TYPE(fun) >= sizeof(GFunc00) && CHECK_TYPE(fun) <= sizeof(GFunc07) || \
-  CHECK_TYPE(fun) >= sizeof(MFunc00) && CHECK_TYPE(fun) <= sizeof(MFunc07))
-
-#define IS_OBJ_FUN(fun) (\
-  CHECK_TYPE(fun) >= sizeof(MFunc0) && CHECK_TYPE(fun) <= sizeof(MFunc7) || \
-  CHECK_TYPE(fun) >= sizeof(MFunc00) && CHECK_TYPE(fun) <= sizeof(MFunc07))
-
-#define ARG_NUM(fun) (\
-  CHECK_TYPE(fun) >= sizeof(GFunc0) && CHECK_TYPE(fun) <= sizeof(GFunc7) ? CHECK_TYPE(fun) - sizeof(GFunc0) : (\
-  CHECK_TYPE(fun) >= sizeof(GFunc00) && CHECK_TYPE(fun) <= sizeof(GFunc07) ? CHECK_TYPE(fun) - sizeof(GFunc00) : (\
-  CHECK_TYPE(fun) >= sizeof(MFunc0) && CHECK_TYPE(fun) <= sizeof(MFunc7) ? CHECK_TYPE(fun) - sizeof(MFunc0) : (\
-  CHECK_TYPE(fun) >= sizeof(MFunc00) && CHECK_TYPE(fun) <= sizeof(MFunc07) ? CHECK_TYPE(fun) - sizeof(MFunc00) : \
-  -1)
+}

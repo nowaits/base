@@ -1,4 +1,5 @@
 #pragma once
+namespace function_type {
 
 template <bool request_default_value>
 struct RequestDefaultValueHelper;
@@ -17,6 +18,4 @@ struct RequestDefaultValueHelper<true> {
   static Yes& RequestDefaultValue(T t);
 };
 
-#define REQUEST_DEFAULT_VALUE(fun) (\
-  sizeof(RequestDefaultValueHelper<!IS_VOID_TYPE(fun)>::RequestDefaultValue(fun)) == \
-  sizeof(Yes))
+}

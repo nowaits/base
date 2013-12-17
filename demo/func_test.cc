@@ -2,8 +2,8 @@
 #include <string>
 #include <assert.h>
 #include "base\basictypes.h"
+#include "base\function_type\type.h"
 #include "base\function_type\func_type.h"
-#include "base\function_type\common_feature.h"
 
 void fun(){*((char*)0) = 0;}
 void funa(int){*((char*)0) = 0;}
@@ -32,7 +32,7 @@ namespace sss {
   bool funb(int){return 0;}
 }
 
-UNIT_TEST(OBJ_FUN) {
+UNIT_TEST(FuncTypeDetect) {
   assert(FuncTypeDetect<>::check(fun, true, true, false, 0));
   assert(FuncTypeDetect<>::check(funa, true, true, false, 1));
   assert(FuncTypeDetect<>::check(funaa, true, true, false, 1));

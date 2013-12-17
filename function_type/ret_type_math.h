@@ -1,4 +1,7 @@
 #pragma once
+
+namespace function_type {
+
 typedef char TypeUnMatch[1];
 typedef char ObjYes[2];
 typedef char GlobYes[3];
@@ -54,4 +57,4 @@ ObjYes& RetTypeCheck(A(OBJ::*)(T1, T2, T3, T4, T5, T6), A);
 template <typename A, typename OBJ, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
 ObjYes& RetTypeCheck(A(OBJ::*)(T1, T2, T3, T4, T5, T6, T7), A);
 
-#define IS_RET_TYPE_OK(fun, x) (sizeof(RetTypeCheck(fun, x)) != sizeof(TypeUnMatch))
+}
