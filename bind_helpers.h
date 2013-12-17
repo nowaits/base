@@ -152,6 +152,7 @@
 #include "base/callback.h"
 #include "base/memory/weak_ptr.h"
 #include "base/template_util.h"
+#include "base/function_type/type.h"
 
 namespace base {
 namespace internal {
@@ -316,6 +317,20 @@ struct IgnoreResultHelper {
   explicit IgnoreResultHelper(T functor) : functor_(functor) {}
 
   T functor_;
+};
+
+template <typename T, typename R>
+struct DefaultResultHelper {
+  explicit DefaultResultHelper(T functor, R default_ret) 
+    : functor_(functor), default_ret_(default_ret) {
+#if 1// TOMO const type detect
+      COMPILE_ASSERT(IS_RET_TYPE_OK(functor, default_ret), 
+        default_ret_type_and_fuck_return_type_is_not_matched);
+#endif
+  }
+
+  T functor_;
+  R default_ret_;
 };
 
 template <typename T>
@@ -529,6 +544,11 @@ template <typename T>
 static inline internal::IgnoreResultHelper<T> IgnoreResult(T data) {
   return internal::IgnoreResultHelper<T>(data);
 }
+
+ template <typename T, typename R>
+ static inline internal::DefaultResultHelper<T, R> DefaultResult(T data, R value) {
+   return internal::DefaultResultHelper<T, R>(data, value);
+ }
 
 template <typename T>
 static inline internal::IgnoreResultHelper<Callback<T> >

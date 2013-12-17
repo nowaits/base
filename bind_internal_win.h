@@ -13,6 +13,7 @@
 #ifndef BASE_BIND_INTERNAL_WIN_H_
 #define BASE_BIND_INTERNAL_WIN_H_
 #pragma once
+#include "base\function_type\type.h"
 
 // In the x64 architecture in Windows, __fastcall, __stdcall, etc, are all
 // the same as __cdecl which would turn the following specializations into
@@ -22,7 +23,7 @@
 namespace base {
 namespace internal {
 
-template <typename Functor>
+template <typename Functor, bool is_void_retun_type = IS_VOID_TYPE((Functor)0)>
 class RunnableAdapter;
 
 // __stdcall Function: Arity 0.

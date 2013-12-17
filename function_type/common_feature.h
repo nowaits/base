@@ -76,19 +76,19 @@ static GFunc01& Check(void(*)(T1));
 template<typename T1, typename T2>
 static GFunc02& Check(void(*)(T1, T2));
 
-template<typename R, typename T1, typename T2, typename T3>
+template<typename T1, typename T2, typename T3>
 static GFunc03& Check(void(*)(T1, T2, T3));
 
-template<typename R, typename T1, typename T2, typename T3, typename T4>
+template<typename T1, typename T2, typename T3, typename T4>
 static GFunc04& Check(void(*)(T1, T2, T3, T4));
 
-template<typename R, typename T1, typename T2, typename T3, typename T4, typename T5>
+template<typename T1, typename T2, typename T3, typename T4, typename T5>
 static GFunc05& Check(void(*)(T1, T2, T3, T4, T5));
 
-template<typename R, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
 static GFunc06& Check(void(*)(T1, T2, T3, T4, T5, T6));
 
-template<typename R, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
+template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
 static GFunc07& Check(void(*)(T1, T2, T3, T4, T5, T6, T7));
 
 // member function

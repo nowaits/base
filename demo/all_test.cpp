@@ -33,8 +33,8 @@
 #include "base\atomic_sequence_num.h"
 #include "base\threading\thread_local.h"
 #include "base\linked_list.h"
-#include "base\func_type.h"
-#include "base\func_type_v.h"
+#include "base\function_type\func_type.h"
+#include "base\function_type\type.h"
 
 //////////////////////////////////////////////////////////////////////////
 class PODClass {

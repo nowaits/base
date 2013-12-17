@@ -21,6 +21,7 @@
 #if defined(OS_WIN)
 #include "base/bind_internal_win.h"
 #endif
+#include "function_type/type.h"
 
 namespace base {
 namespace internal {
@@ -95,9 +96,561 @@ namespace internal {
 // If and only if the wrapper contains a method or const method pointer, an
 // IsMethod typedef is exposed.  The existence of this typedef (NOT the value)
 // marks that the wrapper should be considered a method wrapper.
-
-template <typename Functor>
+#if 0
+template <typename Functor, bool is_void_retun_type = IS_VOID_TYPE((Functor)0)>
 class RunnableAdapter;
+#endif
+//////////////////////////////////////////////////////////////////////////
+////              no return value
+//////////////////////////////////////////////////////////////////////////
+
+// Function: Arity 0.
+template <>
+class RunnableAdapter<void(*)(), true> {
+public:
+  typedef void (RunType)();
+
+  explicit RunnableAdapter(void(*function)())
+    : function_(function) {
+  }
+
+  void Run() {
+    return function_();
+  }
+
+private:
+  void (*function_)();
+};
+
+// Method: Arity 0.
+template <typename T>
+class RunnableAdapter<void(T::*)(), true> {
+public:
+  typedef void (RunType)(T*);
+  typedef true_type IsMethod;
+
+  explicit RunnableAdapter(void(T::*method)())
+    : method_(method) {
+  }
+
+  void Run(T* object) {
+    return (object->*method_)();
+  }
+
+private:
+  void (T::*method_)();
+};
+
+// Const Method: Arity 0.
+template <typename T>
+class RunnableAdapter<void(T::*)() const, true> {
+public:
+  typedef void (RunType)(const T*);
+  typedef true_type IsMethod;
+
+  explicit RunnableAdapter(void(T::*method)() const)
+    : method_(method) {
+  }
+
+  void Run(const T* object) {
+    return (object->*method_)();
+  }
+
+private:
+  void (T::*method_)() const;
+};
+
+
+// Function: Arity 1.
+template <typename A1>
+class RunnableAdapter<void(*)(A1), true> {
+public:
+  typedef void (RunType)(A1);
+
+  explicit RunnableAdapter(void(*function)(A1))
+    : function_(function) {
+  }
+
+  void Run(typename CallbackParamTraits<A1>::ForwardType a1) {
+    return function_(CallbackForward(a1));
+  }
+
+private:
+  void (*function_)(A1);
+};
+
+// Method: Arity 1.
+template <typename T, typename A1>
+class RunnableAdapter<void(T::*)(A1), true> {
+public:
+  typedef void (RunType)(T*, A1);
+  typedef true_type IsMethod;
+
+  explicit RunnableAdapter(void(T::*method)(A1))
+    : method_(method) {
+  }
+
+  void Run(T* object, typename CallbackParamTraits<A1>::ForwardType a1) {
+    return (object->*method_)(CallbackForward(a1));
+  }
+
+private:
+  void (T::*method_)(A1);
+};
+
+// Const Method: Arity 1.
+template <typename T, typename A1>
+class RunnableAdapter<void(T::*)(A1) const, true> {
+public:
+  typedef void (RunType)(const T*, A1);
+  typedef true_type IsMethod;
+
+  explicit RunnableAdapter(void(T::*method)(A1) const)
+    : method_(method) {
+  }
+
+  void Run(const T* object, typename CallbackParamTraits<A1>::ForwardType a1) {
+    return (object->*method_)(CallbackForward(a1));
+  }
+
+private:
+  void (T::*method_)(A1) const;
+};
+
+
+// Function: Arity 2.
+template <typename A1, typename A2>
+class RunnableAdapter<void(*)(A1, A2), true> {
+public:
+  typedef void (RunType)(A1, A2);
+
+  explicit RunnableAdapter(void(*function)(A1, A2))
+    : function_(function) {
+  }
+
+  void Run(typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2) {
+      return function_(CallbackForward(a1), CallbackForward(a2));
+  }
+
+private:
+  void (*function_)(A1, A2);
+};
+
+// Method: Arity 2.
+template <typename T, typename A1, typename A2>
+class RunnableAdapter<void(T::*)(A1, A2), true> {
+public:
+  typedef void (RunType)(T*, A1, A2);
+  typedef true_type IsMethod;
+
+  explicit RunnableAdapter(void(T::*method)(A1, A2))
+    : method_(method) {
+  }
+
+  void Run(T* object, typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2) {
+      return (object->*method_)(CallbackForward(a1), CallbackForward(a2));
+  }
+
+private:
+  void (T::*method_)(A1, A2);
+};
+
+// Const Method: Arity 2.
+template <typename T, typename A1, typename A2>
+class RunnableAdapter<void(T::*)(A1, A2) const, true> {
+public:
+  typedef void (RunType)(const T*, A1, A2);
+  typedef true_type IsMethod;
+
+  explicit RunnableAdapter(void(T::*method)(A1, A2) const)
+    : method_(method) {
+  }
+
+  void Run(const T* object, typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2) {
+      return (object->*method_)(CallbackForward(a1), CallbackForward(a2));
+  }
+
+private:
+  void (T::*method_)(A1, A2) const;
+};
+
+// Function: Arity 3.
+template <typename A1, typename A2, typename A3>
+class RunnableAdapter<void(*)(A1, A2, A3), true> {
+public:
+  typedef void (RunType)(A1, A2, A3);
+
+  explicit RunnableAdapter(void(*function)(A1, A2, A3))
+    : function_(function) {
+  }
+
+  void Run(typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2,
+    typename CallbackParamTraits<A3>::ForwardType a3) {
+      return function_(CallbackForward(a1), CallbackForward(a2),
+        CallbackForward(a3));
+  }
+
+private:
+  void (*function_)(A1, A2, A3);
+};
+
+// Method: Arity 3.
+template <typename T, typename A1, typename A2, typename A3>
+class RunnableAdapter<void(T::*)(A1, A2, A3), true> {
+public:
+  typedef void (RunType)(T*, A1, A2, A3);
+  typedef true_type IsMethod;
+
+  explicit RunnableAdapter(void(T::*method)(A1, A2, A3))
+    : method_(method) {
+  }
+
+  void Run(T* object, typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2,
+    typename CallbackParamTraits<A3>::ForwardType a3) {
+      return (object->*method_)(CallbackForward(a1), CallbackForward(a2),
+        CallbackForward(a3));
+  }
+
+private:
+  void (T::*method_)(A1, A2, A3);
+};
+
+// Const Method: Arity 3.
+template <typename T, typename A1, typename A2, typename A3>
+class RunnableAdapter<void(T::*)(A1, A2, A3) const, true> {
+public:
+  typedef void (RunType)(const T*, A1, A2, A3);
+  typedef true_type IsMethod;
+
+  explicit RunnableAdapter(void(T::*method)(A1, A2, A3) const)
+    : method_(method) {
+  }
+
+  void Run(const T* object, typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2,
+    typename CallbackParamTraits<A3>::ForwardType a3) {
+      return (object->*method_)(CallbackForward(a1), CallbackForward(a2),
+        CallbackForward(a3));
+  }
+
+private:
+  void (T::*method_)(A1, A2, A3) const;
+};
+
+
+// Function: Arity 4.
+template <typename A1, typename A2, typename A3, typename A4>
+class RunnableAdapter<void(*)(A1, A2, A3, A4), true> {
+public:
+  typedef void (RunType)(A1, A2, A3, A4);
+
+  explicit RunnableAdapter(void(*function)(A1, A2, A3, A4))
+    : function_(function) {
+  }
+
+  void Run(typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2,
+    typename CallbackParamTraits<A3>::ForwardType a3,
+    typename CallbackParamTraits<A4>::ForwardType a4) {
+      return function_(CallbackForward(a1), CallbackForward(a2),
+        CallbackForward(a3), CallbackForward(a4));
+  }
+
+private:
+  void (*function_)(A1, A2, A3, A4);
+};
+
+// Method: Arity 4.
+template <typename T, typename A1, typename A2, typename A3,
+typename A4>
+class RunnableAdapter<void(T::*)(A1, A2, A3, A4), true> {
+public:
+  typedef void (RunType)(T*, A1, A2, A3, A4);
+  typedef true_type IsMethod;
+
+  explicit RunnableAdapter(void(T::*method)(A1, A2, A3, A4))
+    : method_(method) {
+  }
+
+  void Run(T* object, typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2,
+    typename CallbackParamTraits<A3>::ForwardType a3,
+    typename CallbackParamTraits<A4>::ForwardType a4) {
+      return (object->*method_)(CallbackForward(a1), CallbackForward(a2),
+        CallbackForward(a3), CallbackForward(a4));
+  }
+
+private:
+  void (T::*method_)(A1, A2, A3, A4);
+};
+
+// Const Method: Arity 4.
+template <typename T, typename A1, typename A2, typename A3,
+typename A4>
+class RunnableAdapter<void(T::*)(A1, A2, A3, A4) const, true> {
+public:
+  typedef void (RunType)(const T*, A1, A2, A3, A4);
+  typedef true_type IsMethod;
+
+  explicit RunnableAdapter(void(T::*method)(A1, A2, A3, A4) const)
+    : method_(method) {
+  }
+
+  void Run(const T* object, typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2,
+    typename CallbackParamTraits<A3>::ForwardType a3,
+    typename CallbackParamTraits<A4>::ForwardType a4) {
+      return (object->*method_)(CallbackForward(a1), CallbackForward(a2),
+        CallbackForward(a3), CallbackForward(a4));
+  }
+
+private:
+  void (T::*method_)(A1, A2, A3, A4) const;
+};
+
+// Function: Arity 5.
+template <typename A1, typename A2, typename A3, typename A4,
+typename A5>
+class RunnableAdapter<void(*)(A1, A2, A3, A4, A5), true> {
+public:
+  typedef void (RunType)(A1, A2, A3, A4, A5);
+
+  explicit RunnableAdapter(void(*function)(A1, A2, A3, A4, A5))
+    : function_(function) {
+  }
+
+  void Run(typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2,
+    typename CallbackParamTraits<A3>::ForwardType a3,
+    typename CallbackParamTraits<A4>::ForwardType a4,
+    typename CallbackParamTraits<A5>::ForwardType a5) {
+      return function_(CallbackForward(a1), CallbackForward(a2),
+        CallbackForward(a3), CallbackForward(a4), CallbackForward(a5));
+  }
+
+private:
+  void (*function_)(A1, A2, A3, A4, A5);
+};
+
+// Method: Arity 5.
+template <typename T, typename A1, typename A2, typename A3,
+typename A4, typename A5>
+class RunnableAdapter<void(T::*)(A1, A2, A3, A4, A5), true> {
+public:
+  typedef void (RunType)(T*, A1, A2, A3, A4, A5);
+  typedef true_type IsMethod;
+
+  explicit RunnableAdapter(void(T::*method)(A1, A2, A3, A4, A5))
+    : method_(method) {
+  }
+
+  void Run(T* object, typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2,
+    typename CallbackParamTraits<A3>::ForwardType a3,
+    typename CallbackParamTraits<A4>::ForwardType a4,
+    typename CallbackParamTraits<A5>::ForwardType a5) {
+      return (object->*method_)(CallbackForward(a1), CallbackForward(a2),
+        CallbackForward(a3), CallbackForward(a4), CallbackForward(a5));
+  }
+
+private:
+  void (T::*method_)(A1, A2, A3, A4, A5);
+};
+
+// Const Method: Arity 5.
+template <typename T, typename A1, typename A2, typename A3,
+typename A4, typename A5>
+class RunnableAdapter<void(T::*)(A1, A2, A3, A4, A5) const, true> {
+public:
+  typedef void (RunType)(const T*, A1, A2, A3, A4, A5);
+  typedef true_type IsMethod;
+
+  explicit RunnableAdapter(void(T::*method)(A1, A2, A3, A4, A5) const)
+    : method_(method) {
+  }
+
+  void Run(const T* object, typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2,
+    typename CallbackParamTraits<A3>::ForwardType a3,
+    typename CallbackParamTraits<A4>::ForwardType a4,
+    typename CallbackParamTraits<A5>::ForwardType a5) {
+      return (object->*method_)(CallbackForward(a1), CallbackForward(a2),
+        CallbackForward(a3), CallbackForward(a4), CallbackForward(a5));
+  }
+
+private:
+  void (T::*method_)(A1, A2, A3, A4, A5) const;
+};
+
+// Function: Arity 6.
+template <typename A1, typename A2, typename A3, typename A4,
+typename A5, typename A6>
+class RunnableAdapter<void(*)(A1, A2, A3, A4, A5, A6), true> {
+public:
+  typedef void (RunType)(A1, A2, A3, A4, A5, A6);
+
+  explicit RunnableAdapter(void(*function)(A1, A2, A3, A4, A5, A6))
+    : function_(function) {
+  }
+
+  void Run(typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2,
+    typename CallbackParamTraits<A3>::ForwardType a3,
+    typename CallbackParamTraits<A4>::ForwardType a4,
+    typename CallbackParamTraits<A5>::ForwardType a5,
+    typename CallbackParamTraits<A6>::ForwardType a6) {
+      return function_(CallbackForward(a1), CallbackForward(a2),
+        CallbackForward(a3), CallbackForward(a4), CallbackForward(a5),
+        CallbackForward(a6));
+  }
+
+private:
+  void (*function_)(A1, A2, A3, A4, A5, A6);
+};
+
+// Method: Arity 6.
+template <typename T, typename A1, typename A2, typename A3,
+typename A4, typename A5, typename A6>
+class RunnableAdapter<void(T::*)(A1, A2, A3, A4, A5, A6), true> {
+public:
+  typedef void (RunType)(T*, A1, A2, A3, A4, A5, A6);
+  typedef true_type IsMethod;
+
+  explicit RunnableAdapter(void(T::*method)(A1, A2, A3, A4, A5, A6))
+    : method_(method) {
+  }
+
+  void Run(T* object, typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2,
+    typename CallbackParamTraits<A3>::ForwardType a3,
+    typename CallbackParamTraits<A4>::ForwardType a4,
+    typename CallbackParamTraits<A5>::ForwardType a5,
+    typename CallbackParamTraits<A6>::ForwardType a6) {
+      return (object->*method_)(CallbackForward(a1), CallbackForward(a2),
+        CallbackForward(a3), CallbackForward(a4), CallbackForward(a5),
+        CallbackForward(a6));
+  }
+
+private:
+  void (T::*method_)(A1, A2, A3, A4, A5, A6);
+};
+
+// Const Method: Arity 6.
+template <typename T, typename A1, typename A2, typename A3,
+typename A4, typename A5, typename A6>
+class RunnableAdapter<void(T::*)(A1, A2, A3, A4, A5, A6) const, true> {
+public:
+  typedef void (RunType)(const T*, A1, A2, A3, A4, A5, A6);
+  typedef true_type IsMethod;
+
+  explicit RunnableAdapter(void(T::*method)(A1, A2, A3, A4, A5, A6) const)
+    : method_(method) {
+  }
+
+  void Run(const T* object, typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2,
+    typename CallbackParamTraits<A3>::ForwardType a3,
+    typename CallbackParamTraits<A4>::ForwardType a4,
+    typename CallbackParamTraits<A5>::ForwardType a5,
+    typename CallbackParamTraits<A6>::ForwardType a6) {
+      return (object->*method_)(CallbackForward(a1), CallbackForward(a2),
+        CallbackForward(a3), CallbackForward(a4), CallbackForward(a5),
+        CallbackForward(a6));
+  }
+
+private:
+  void (T::*method_)(A1, A2, A3, A4, A5, A6) const;
+};
+
+// Function: Arity 7.
+template <typename A1, typename A2, typename A3, typename A4,
+typename A5, typename A6, typename A7>
+class RunnableAdapter<void(*)(A1, A2, A3, A4, A5, A6, A7), true> {
+public:
+  typedef void (RunType)(A1, A2, A3, A4, A5, A6, A7);
+
+  explicit RunnableAdapter(void(*function)(A1, A2, A3, A4, A5, A6, A7))
+    : function_(function) {
+  }
+
+  void Run(typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2,
+    typename CallbackParamTraits<A3>::ForwardType a3,
+    typename CallbackParamTraits<A4>::ForwardType a4,
+    typename CallbackParamTraits<A5>::ForwardType a5,
+    typename CallbackParamTraits<A6>::ForwardType a6,
+    typename CallbackParamTraits<A7>::ForwardType a7) {
+      return function_(CallbackForward(a1), CallbackForward(a2),
+        CallbackForward(a3), CallbackForward(a4), CallbackForward(a5),
+        CallbackForward(a6), CallbackForward(a7));
+  }
+
+private:
+  void (*function_)(A1, A2, A3, A4, A5, A6, A7);
+};
+
+// Method: Arity 7.
+template <typename T, typename A1, typename A2, typename A3,
+typename A4, typename A5, typename A6, typename A7>
+class RunnableAdapter<void(T::*)(A1, A2, A3, A4, A5, A6, A7), true> {
+public:
+  typedef void (RunType)(T*, A1, A2, A3, A4, A5, A6, A7);
+  typedef true_type IsMethod;
+
+  explicit RunnableAdapter(void(T::*method)(A1, A2, A3, A4, A5, A6, A7))
+    : method_(method) {
+  }
+
+  void Run(T* object, typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2,
+    typename CallbackParamTraits<A3>::ForwardType a3,
+    typename CallbackParamTraits<A4>::ForwardType a4,
+    typename CallbackParamTraits<A5>::ForwardType a5,
+    typename CallbackParamTraits<A6>::ForwardType a6,
+    typename CallbackParamTraits<A7>::ForwardType a7) {
+      return (object->*method_)(CallbackForward(a1), CallbackForward(a2),
+        CallbackForward(a3), CallbackForward(a4), CallbackForward(a5),
+        CallbackForward(a6), CallbackForward(a7));
+  }
+
+private:
+  void (T::*method_)(A1, A2, A3, A4, A5, A6, A7);
+};
+
+// Const Method: Arity 7.
+template <typename T, typename A1, typename A2, typename A3,
+typename A4, typename A5, typename A6, typename A7>
+class RunnableAdapter<void(T::*)(A1, A2, A3, A4, A5, A6, A7) const, true> {
+public:
+  typedef void (RunType)(const T*, A1, A2, A3, A4, A5, A6, A7);
+  typedef true_type IsMethod;
+
+  explicit RunnableAdapter(void(T::*method)(A1, A2, A3, A4, A5, A6, A7) const)
+    : method_(method) {
+  }
+
+  void Run(const T* object, typename CallbackParamTraits<A1>::ForwardType a1,
+    typename CallbackParamTraits<A2>::ForwardType a2,
+    typename CallbackParamTraits<A3>::ForwardType a3,
+    typename CallbackParamTraits<A4>::ForwardType a4,
+    typename CallbackParamTraits<A5>::ForwardType a5,
+    typename CallbackParamTraits<A6>::ForwardType a6,
+    typename CallbackParamTraits<A7>::ForwardType a7) {
+      return (object->*method_)(CallbackForward(a1), CallbackForward(a2),
+        CallbackForward(a3), CallbackForward(a4), CallbackForward(a5),
+        CallbackForward(a6), CallbackForward(a7));
+  }
+
+private:
+  void (T::*method_)(A1, A2, A3, A4, A5, A6, A7) const;
+};
+
+//////////////////////////////////////////////////////////////////////////
 
 // Function: Arity 0.
 template <typename R>
@@ -119,7 +672,7 @@ class RunnableAdapter<R(*)()> {
 
 // Method: Arity 0.
 template <typename R, typename T>
-class RunnableAdapter<R(T::*)()> {
+class RunnableAdapter<R(T::*)(), false> {
  public:
   typedef R (RunType)(T*);
   typedef true_type IsMethod;
@@ -132,8 +685,15 @@ class RunnableAdapter<R(T::*)()> {
     return (object->*method_)();
   }
 
+  R default_value() {return default_value_;}
+
+  void SetDefaultValue(R default_value) {
+    default_value_ = default_value;
+  }
+
  private:
-  R (T::*method_)();
+   R (T::*method_)();
+   R default_value_;
 };
 
 // Const Method: Arity 0.
@@ -151,8 +711,15 @@ class RunnableAdapter<R(T::*)() const> {
     return (object->*method_)();
   }
 
+  const R& default_value() {return default_value_;}
+
+  void SetDefaultValue(R default_value) {
+    default_value_ = default_value;
+  }
+
  private:
-  R (T::*method_)() const;
+   R (T::*method_)() const;
+   R default_value_;
 };
 
 // Function: Arity 1.
@@ -188,8 +755,15 @@ class RunnableAdapter<R(T::*)(A1)> {
     return (object->*method_)(CallbackForward(a1));
   }
 
+  const R& default_value() {return default_value_;}
+
+  void SetDefaultValue(R default_value) {
+    default_value_ = default_value;
+  }
+
  private:
-  R (T::*method_)(A1);
+   R (T::*method_)(A1);
+   R default_value_;
 };
 
 // Const Method: Arity 1.
@@ -207,8 +781,15 @@ class RunnableAdapter<R(T::*)(A1) const> {
     return (object->*method_)(CallbackForward(a1));
   }
 
+  const R& default_value() {return default_value_;}
+
+  void SetDefaultValue(R default_value) {
+    default_value_ = default_value;
+  }
+
  private:
-  R (T::*method_)(A1) const;
+   R (T::*method_)(A1) const;
+   R default_value_;
 };
 
 // Function: Arity 2.
@@ -246,8 +827,15 @@ class RunnableAdapter<R(T::*)(A1, A2)> {
     return (object->*method_)(CallbackForward(a1), CallbackForward(a2));
   }
 
+  const R& default_value() {return default_value_;}
+
+  void SetDefaultValue(R default_value) {
+    default_value_ = default_value;
+  }
+
  private:
-  R (T::*method_)(A1, A2);
+   R (T::*method_)(A1, A2);
+   R default_value_;
 };
 
 // Const Method: Arity 2.
@@ -266,8 +854,15 @@ class RunnableAdapter<R(T::*)(A1, A2) const> {
     return (object->*method_)(CallbackForward(a1), CallbackForward(a2));
   }
 
+  const R& default_value() {return default_value_;}
+
+  void SetDefaultValue(R default_value) {
+    default_value_ = default_value;
+  }
+
  private:
-  R (T::*method_)(A1, A2) const;
+   R (T::*method_)(A1, A2) const;
+   R default_value_;
 };
 
 // Function: Arity 3.
@@ -309,8 +904,15 @@ class RunnableAdapter<R(T::*)(A1, A2, A3)> {
         CallbackForward(a3));
   }
 
+  const R& default_value() {return default_value_;}
+
+  void SetDefaultValue(R default_value) {
+    default_value_ = default_value;
+  }
+
  private:
-  R (T::*method_)(A1, A2, A3);
+   R (T::*method_)(A1, A2, A3);
+   R default_value_;
 };
 
 // Const Method: Arity 3.
@@ -331,8 +933,15 @@ class RunnableAdapter<R(T::*)(A1, A2, A3) const> {
         CallbackForward(a3));
   }
 
+  const R& default_value() {return default_value_;}
+
+  void SetDefaultValue(R default_value) {
+    default_value_ = default_value;
+  }
+
  private:
-  R (T::*method_)(A1, A2, A3) const;
+   R (T::*method_)(A1, A2, A3) const;
+   R default_value_;
 };
 
 // Function: Arity 4.
@@ -377,8 +986,15 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4)> {
         CallbackForward(a3), CallbackForward(a4));
   }
 
+  const R& default_value() {return default_value_;}
+
+  void SetDefaultValue(R default_value) {
+    default_value_ = default_value;
+  }
+
  private:
-  R (T::*method_)(A1, A2, A3, A4);
+   R (T::*method_)(A1, A2, A3, A4);
+   R default_value_;
 };
 
 // Const Method: Arity 4.
@@ -401,8 +1017,15 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4) const> {
         CallbackForward(a3), CallbackForward(a4));
   }
 
+  const R& default_value() {return default_value_;}
+
+  void SetDefaultValue(R default_value) {
+    default_value_ = default_value;
+  }
+
  private:
-  R (T::*method_)(A1, A2, A3, A4) const;
+   R (T::*method_)(A1, A2, A3, A4) const;
+   R default_value_;
 };
 
 // Function: Arity 5.
@@ -450,8 +1073,15 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5)> {
         CallbackForward(a3), CallbackForward(a4), CallbackForward(a5));
   }
 
+  const R& default_value() {return default_value_;}
+
+  void SetDefaultValue(R default_value) {
+    default_value_ = default_value;
+  }
+
  private:
-  R (T::*method_)(A1, A2, A3, A4, A5);
+   R (T::*method_)(A1, A2, A3, A4, A5);
+   R default_value_;
 };
 
 // Const Method: Arity 5.
@@ -475,8 +1105,15 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5) const> {
         CallbackForward(a3), CallbackForward(a4), CallbackForward(a5));
   }
 
+  const R& default_value() {return default_value_;}
+
+  void SetDefaultValue(R default_value) {
+    default_value_ = default_value;
+  }
+
  private:
-  R (T::*method_)(A1, A2, A3, A4, A5) const;
+   R (T::*method_)(A1, A2, A3, A4, A5) const;
+   R default_value_;
 };
 
 // Function: Arity 6.
@@ -528,8 +1165,15 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5, A6)> {
         CallbackForward(a6));
   }
 
+  const R& default_value() {return default_value_;}
+
+  void SetDefaultValue(R default_value) {
+    default_value_ = default_value;
+  }
+
  private:
-  R (T::*method_)(A1, A2, A3, A4, A5, A6);
+   R (T::*method_)(A1, A2, A3, A4, A5, A6);
+   R default_value_;
 };
 
 // Const Method: Arity 6.
@@ -555,8 +1199,15 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5, A6) const> {
         CallbackForward(a6));
   }
 
+  const R& default_value() {return default_value_;}
+
+  void SetDefaultValue(R default_value) {
+    default_value_ = default_value;
+  }
+
  private:
-  R (T::*method_)(A1, A2, A3, A4, A5, A6) const;
+   R (T::*method_)(A1, A2, A3, A4, A5, A6) const;
+   R default_value_;
 };
 
 // Function: Arity 7.
@@ -610,8 +1261,15 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5, A6, A7)> {
         CallbackForward(a6), CallbackForward(a7));
   }
 
+  const R& default_value() {return default_value_;}
+
+  void SetDefaultValue(R default_value) {
+    default_value_ = default_value;
+  }
+
  private:
-  R (T::*method_)(A1, A2, A3, A4, A5, A6, A7);
+   R (T::*method_)(A1, A2, A3, A4, A5, A6, A7);
+   R default_value_;
 };
 
 // Const Method: Arity 7.
@@ -638,8 +1296,15 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5, A6, A7) const> {
         CallbackForward(a6), CallbackForward(a7));
   }
 
+  const R& default_value() {return default_value_;}
+
+  void SetDefaultValue(R default_value) {
+    default_value_ = default_value;
+  }
+
  private:
-  R (T::*method_)(A1, A2, A3, A4, A5, A6, A7) const;
+   R (T::*method_)(A1, A2, A3, A4, A5, A6, A7) const;
+   R default_value_;
 };
 
 
@@ -774,7 +1439,7 @@ struct ForceVoidReturn<R(A1, A2, A3, A4, A5, A6, A7)> {
 // FunctorTraits<>
 //
 // See description at top of file.
-template <typename T>
+template <typename T, typename R = void>
 struct FunctorTraits {
   typedef RunnableAdapter<T> RunnableType;
   typedef typename RunnableType::RunType RunType;
@@ -785,6 +1450,12 @@ struct FunctorTraits<IgnoreResultHelper<T> > {
   typedef typename FunctorTraits<T>::RunnableType RunnableType;
   typedef typename ForceVoidReturn<
       typename RunnableType::RunType>::RunType RunType;
+};
+
+template <typename T, typename R>
+struct FunctorTraits<DefaultResultHelper<T, R> > {
+  typedef RunnableAdapter<T> RunnableType;
+  typedef typename RunnableType::RunType RunType;
 };
 
 template <typename T>
@@ -807,6 +1478,70 @@ template <typename T>
 typename FunctorTraits<T>::RunnableType
 MakeRunnable(const IgnoreResultHelper<T>& t) {
   return MakeRunnable(t.functor_);
+}
+
+template <typename T, typename M>
+typename FunctorTraits<T(M::*)()>::RunnableType
+  MakeRunnable(const DefaultResultHelper<T(M::*)(), T>& t) {
+    typename FunctorTraits<T(M::*)(), T>::RunnableType runnable = MakeRunnable(t.functor_);
+    runnable.SetDefaultValue(t.default_ret_);
+    return runnable;
+}
+
+template <typename T, typename M, typename T1>
+typename FunctorTraits<T(M::*)(T1)>::RunnableType
+MakeRunnable(const DefaultResultHelper<T(M::*)(T1), T>& t) {
+  typename FunctorTraits<T(M::*)(T1), T>::RunnableType runnable = MakeRunnable(t.functor_);
+  runnable.SetDefaultValue(t.default_ret_);
+  return runnable;
+}
+
+template <typename T, typename M, typename T1, typename T2>
+typename FunctorTraits<T(M::*)(T1, T2)>::RunnableType
+MakeRunnable(const DefaultResultHelper<T(M::*)(T1, T2), T>& t) {
+  typename FunctorTraits<T(M::*)(T1, T2), T>::RunnableType runnable = MakeRunnable(t.functor_);
+  runnable.SetDefaultValue(t.default_ret_);
+  return runnable;
+}
+
+template <typename T, typename M, typename T1, typename T2, typename T3>
+typename FunctorTraits<T(M::*)(T1, T2, T3)>::RunnableType
+MakeRunnable(const DefaultResultHelper<T(M::*)(T1, T2, T3), T>& t) {
+  typename FunctorTraits<T(M::*)(T1, T2, T3), T>::RunnableType runnable = MakeRunnable(t.functor_);
+  runnable.SetDefaultValue(t.default_ret_);
+  return runnable;
+}
+
+template <typename T, typename M, typename T1, typename T2, typename T3, typename T4>
+typename FunctorTraits<T(M::*)(T1, T2, T3, T4)>::RunnableType
+MakeRunnable(const DefaultResultHelper<T(M::*)(T1, T2, T3, T4), T>& t) {
+  typename FunctorTraits<T(M::*)(T1, T2, T3, T4), T>::RunnableType runnable = MakeRunnable(t.functor_);
+  runnable.SetDefaultValue(t.default_ret_);
+  return runnable;
+}
+
+template <typename T, typename M, typename T1, typename T2, typename T3, typename T4, typename T5>
+typename FunctorTraits<T(M::*)(T1, T2, T3, T4, T5)>::RunnableType
+MakeRunnable(const DefaultResultHelper<T(M::*)(T1, T2, T3, T4, T5), T>& t) {
+  typename FunctorTraits<T(M::*)(T1, T2, T3, T4, T5), T>::RunnableType runnable = MakeRunnable(t.functor_);
+  runnable.SetDefaultValue(t.default_ret_);
+  return runnable;
+}
+
+template <typename T, typename M, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+typename FunctorTraits<T(M::*)(T1, T2, T3, T4, T5, T6)>::RunnableType
+MakeRunnable(const DefaultResultHelper<T(M::*)(T1, T2, T3, T4, T5, T6), T>& t) {
+  typename FunctorTraits<T(M::*)(T1, T2, T3, T4, T5, T6), T>::RunnableType runnable = MakeRunnable(t.functor_);
+  runnable.SetDefaultValue(t.default_ret_);
+  return runnable;
+}
+
+template <typename T, typename M, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
+typename FunctorTraits<T(M::*)(T1, T2, T3, T4, T5, T6, T7)>::RunnableType
+MakeRunnable(const DefaultResultHelper<T(M::*)(T1, T2, T3, T4, T5, T6, T7), T>& t) {
+  typename FunctorTraits<T(M::*)(T1, T2, T3, T4, T5, T6, T7), T>::RunnableType runnable = MakeRunnable(t.functor_);
+  runnable.SetDefaultValue(t.default_ret_);
+  return runnable;
 }
 
 template <typename T>
@@ -1094,7 +1829,90 @@ struct InvokeHelper<true, ReturnType, Runnable, ArgsType> {
   COMPILE_ASSERT(is_void<ReturnType>::value,
                  weak_ptrs_can_only_bind_to_methods_without_return_values);
 };
+#else
+// for weak ptr
+template <typename ReturnType, typename Runnable, typename A1>
+struct InvokeHelper<true, ReturnType, Runnable, void(A1)> {
+  static int MakeItSo(Runnable runnable, A1 a1) {
+      if (!a1.get()) {
+        return runnable.default_value();
+      }
 
+      return runnable.Run(CallbackForward(a1));
+  }
+};
+
+template <typename ReturnType, typename Runnable, typename A1, typename A2>
+struct InvokeHelper<true, ReturnType, Runnable, void(A1, A2)> {
+  static int MakeItSo(Runnable runnable, A1 a1, A2 a2) {
+    if (!a1.get()) {
+      return runnable.default_value();
+    }
+
+    return runnable.Run(CallbackForward(a1), CallbackForward(a2));
+  }
+};
+
+template <typename ReturnType, typename Runnable, typename A1, typename A2, typename A3>
+struct InvokeHelper<true, ReturnType, Runnable, void(A1, A2, A3)> {
+  static int MakeItSo(Runnable runnable, A1 a1, A2 a2, A3 a3) {
+    if (!a1.get()) {
+      return runnable.default_value();
+    }
+
+    return runnable.Run(CallbackForward(a1), CallbackForward(a2), CallbackForward(a3));
+  }
+};
+
+template <typename ReturnType, typename Runnable, typename A1, typename A2, typename A3, typename A4>
+struct InvokeHelper<true, ReturnType, Runnable, void(A1, A2, A3, A4)> {
+  static int MakeItSo(Runnable runnable, A1 a1, A2 a2, A3 a3, A4 a4) {
+    if (!a1.get()) {
+      return runnable.default_value();
+    }
+
+    return runnable.Run(CallbackForward(a1), CallbackForward(a2), CallbackForward(a3), CallbackForward(a4));
+  }
+};
+
+template <typename ReturnType, typename Runnable, typename A1, typename A2, typename A3, typename A4
+, typename A5>
+struct InvokeHelper<true, ReturnType, Runnable, void(A1, A2, A3, A4, A5)> {
+  static int MakeItSo(Runnable runnable, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5) {
+    if (!a1.get()) {
+      return runnable.default_value();
+    }
+
+    return runnable.Run(CallbackForward(a1), CallbackForward(a2), CallbackForward(a3), CallbackForward(a4)
+      , CallbackForward(a5));
+  }
+};
+
+template <typename ReturnType, typename Runnable, typename A1, typename A2, typename A3, typename A4
+, typename A5, typename A6>
+struct InvokeHelper<true, ReturnType, Runnable, void(A1, A2, A3, A4, A5, A6)> {
+  static int MakeItSo(Runnable runnable, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6) {
+    if (!a1.get()) {
+      return runnable.default_value();
+    }
+
+    return runnable.Run(CallbackForward(a1), CallbackForward(a2), CallbackForward(a3), CallbackForward(a4)
+      , CallbackForward(a5), CallbackForward(a6));
+  }
+};
+
+template <typename ReturnType, typename Runnable, typename A1, typename A2, typename A3, typename A4
+, typename A5, typename A6, typename A7>
+struct InvokeHelper<true, ReturnType, Runnable, void(A1, A2, A3, A4, A5, A6, A7)> {
+  static int MakeItSo(Runnable runnable, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7) {
+    if (!a1.get()) {
+      return runnable.default_value();
+    }
+
+    return runnable.Run(CallbackForward(a1), CallbackForward(a2), CallbackForward(a3), CallbackForward(a4)
+      , CallbackForward(a5), CallbackForward(a6), CallbackForward(a7));
+  }
+};
 #endif
 
 // Invoker<>

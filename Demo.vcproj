@@ -173,7 +173,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="源文件"
+			Name="demo"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
@@ -182,7 +182,6 @@
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
-					ExcludedFromBuild="true"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -191,6 +190,10 @@
 			</File>
 			<File
 				RelativePath=".\demo\bind_weak_ptr_test.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\demo\blank_test.cc"
 				>
 			</File>
 			<File
@@ -208,19 +211,37 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\func_type_v.h"
-				>
-			</File>
-			<File
 				RelativePath=".\test\unit_test.h"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="资源文件"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+			Name="function_type"
 			>
+			<File
+				RelativePath=".\function_type\common_feature.h"
+				>
+			</File>
+			<File
+				RelativePath=".\function_type\func_type.h"
+				>
+			</File>
+			<File
+				RelativePath=".\function_type\request_value.h"
+				>
+			</File>
+			<File
+				RelativePath=".\function_type\ret_type_math.h"
+				>
+			</File>
+			<File
+				RelativePath=".\function_type\test.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\function_type\type.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

@@ -109,6 +109,9 @@ Bind(Functor functor, const P1& p1) {
   typedef internal::BindState<RunnableType, RunType,
       void(typename internal::CallbackParamTraits<P1>::StorageType)> BindState;
 
+  COMPILE_ASSERT(
+    !(BindState::IsWeakCall::value && IS_OBJ_FUN(functor) && !IS_VOID_TYPE(functor)),
+    you_need_suplay_a_default_ret_value_for_weak_call);
 
   return Callback<typename BindState::UnboundRunType>(
       new BindState(internal::MakeRunnable(functor), p1));
@@ -160,7 +163,7 @@ Bind(Functor functor, const P1& p1, const P2& p2) {
       void(typename internal::CallbackParamTraits<P1>::StorageType,
       typename internal::CallbackParamTraits<P2>::StorageType)> BindState;
 
-
+  //internal::CallbackParamTraits<P1>::StorageType::IsWeakCall::value;
   return Callback<typename BindState::UnboundRunType>(
       new BindState(internal::MakeRunnable(functor), p1, p2));
 }
