@@ -169,9 +169,6 @@ UNIT_TEST(Tuple) {
 }
 #else
 
-COMPILE_ASSERT(IS_OBJ_FUN(&Tuple_Class::SomeMeth) == true, sdfsfd);
-COMPILE_ASSERT(IS_OBJ_FUN(&Tuple_Class::Method) == false, sdfsfd);
-
 UNIT_TEST(Tuple) {
   Tuple_Class t;
   int x = 1;

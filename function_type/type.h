@@ -31,3 +31,25 @@
 #define IS_RET_TYPE_OK(fun, x) (\
   sizeof(function_type::RetTypeCheck(fun, x)) != sizeof(function_type::TypeUnMatch) &&\
   sizeof(function_type::RetTypeCheck(fun, x)) != sizeof(function_type::TypeEque))
+
+
+namespace function_type {
+
+template<typename T, bool boos =  REQUEST_DEFAULT_VALUE(*((T*)0))>
+struct NeedDefaultRetValueHelper;
+
+template<typename T>
+struct NeedDefaultRetValueHelper<T, true> {
+  static Yes& NeedDefaultRetValue(T t);
+};
+
+template<typename T>
+struct NeedDefaultRetValueHelper<T, false> {
+  static No& NeedDefaultRetValue(T t);
+};
+}
+
+template<typename T>
+bool NeedDefaultRetValue(T t) {
+  return sizeof(function_type::NeedDefaultRetValueHelper<T>::NeedDefaultRetValue(t)) == sizeof(function_type::Yes);
+}
