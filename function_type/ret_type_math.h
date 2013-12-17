@@ -3,11 +3,15 @@
 namespace function_type {
 
 typedef char TypeUnMatch[1];
-typedef char ObjYes[2];
-typedef char GlobYes[3];
+typedef char TypeEque[2];
+typedef char ObjYes[3];
+typedef char GlobYes[4];
 
 template <typename A, typename B>
 TypeUnMatch& RetTypeCheck(A, B);
+
+template <typename A>
+TypeEque& RetTypeCheck(A, A);
 
 template <typename A>
 GlobYes& RetTypeCheck(A(*)(), A);

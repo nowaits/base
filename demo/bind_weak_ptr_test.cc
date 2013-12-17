@@ -52,11 +52,16 @@ UNIT_TEST(WeakPtrTestModify) {
   call_back.Run();
 }
 
+int WeakFun(base::WeakPtr<WeakPtrTest> weak, int default);
+
+COMPILE_ASSERT(IS_EQUE_TYPE(0.3, float(0.3)) == false, ok);
+COMPILE_ASSERT(IS_EQUE_TYPE(&WeakPtrTest::WeakFun, WeakFun), ok);
+COMPILE_ASSERT(IS_RET_TYPE_OK(&WeakPtrTest::WeakFun, int(0)), ok);
+COMPILE_ASSERT(IS_RET_TYPE_OK(&WeakPtrTest::WeakCallBackTestA, int(0)), ok);
+COMPILE_ASSERT(!IS_VOID_TYPE(&WeakPtrTest::WeakCallBackTestA), this_case_need_a_return_type_function);
+COMPILE_ASSERT(REQUEST_DEFAULT_VALUE(&WeakPtrTest::WeakCallBackTestA), request_default_value);
+COMPILE_ASSERT(!REQUEST_DEFAULT_VALUE(&WeakPtrTest::WeakCallBackTestB), request_default_value);
+
 UNIT_TEST(Template_test) {
-  int x = 100;
-  COMPILE_ASSERT(IS_RET_TYPE_OK(&WeakPtrTest::WeakFun, x), ok);
-  COMPILE_ASSERT(IS_RET_TYPE_OK(&WeakPtrTest::WeakCallBackTestA, x), ok);
-  COMPILE_ASSERT(!IS_VOID_TYPE(&WeakPtrTest::WeakCallBackTestA), this_case_need_a_return_type_function);
-  COMPILE_ASSERT(REQUEST_DEFAULT_VALUE(&WeakPtrTest::WeakCallBackTestA), request_default_value);
-  COMPILE_ASSERT(!REQUEST_DEFAULT_VALUE(&WeakPtrTest::WeakCallBackTestB), request_default_value);
+
 }

@@ -27,4 +27,7 @@
   sizeof(function_type::Yes))
 
 //
-#define IS_RET_TYPE_OK(fun, x) (sizeof(function_type::RetTypeCheck(fun, x)) != sizeof(function_type::TypeUnMatch))
+#define IS_EQUE_TYPE(a, b) (sizeof(function_type::RetTypeCheck(a, b)) == sizeof(function_type::TypeEque))
+#define IS_RET_TYPE_OK(fun, x) (\
+  sizeof(function_type::RetTypeCheck(fun, x)) != sizeof(function_type::TypeUnMatch) &&\
+  sizeof(function_type::RetTypeCheck(fun, x)) != sizeof(function_type::TypeEque))

@@ -168,11 +168,13 @@ UNIT_TEST(Tuple) {
   DisplatchMethod(&Tuple_Class::SomeMeth, MakeTuple(x, std::string("ddd")), &t);
 }
 #else
+
+COMPILE_ASSERT(IS_OBJ_FUN(&Tuple_Class::SomeMeth) == true, sdfsfd);
+COMPILE_ASSERT(IS_OBJ_FUN(&Tuple_Class::Method) == false, sdfsfd);
+
 UNIT_TEST(Tuple) {
   Tuple_Class t;
   int x = 1;
-  COMPILE_ASSERT(IS_OBJ_FUN(&Tuple_Class::SomeMeth) == true, sdfsfd);
-  COMPILE_ASSERT(IS_OBJ_FUN(&Tuple_Class::Method) == false, sdfsfd);
   if (FuncTypeDetect<>::IsObjFunction(&Tuple_Class::SomeMeth))
     DispatchToMethod(&t, &Tuple_Class::SomeMeth, MakeTuple(1, std::string("ddd")));
   else
