@@ -108,10 +108,10 @@ Bind(Functor functor, const P1& p1) {
                  first_bound_argument_to_method_cannot_be_array);
   typedef internal::BindState<RunnableType, RunType,
       void(typename internal::CallbackParamTraits<P1>::StorageType)> BindState;
-
-  COMPILE_ASSERT(
-    !(BindState::IsWeakCall::value && IS_OBJ_FUN(functor) && !IS_VOID_TYPE(functor)),
-    you_need_suplay_a_default_ret_value_for_weak_call);
+  
+  COMPILE_ASSERT(internal::DefaultResultTag<Functor>::value && BindState::IsWeakCall::value ||
+    !BindState::IsWeakCall::value
+    , you_need_suplay_a_default_ret_value_for_weak_call);
 
   return Callback<typename BindState::UnboundRunType>(
       new BindState(internal::MakeRunnable(functor), p1));
@@ -162,6 +162,10 @@ Bind(Functor functor, const P1& p1, const P2& p2) {
   typedef internal::BindState<RunnableType, RunType,
       void(typename internal::CallbackParamTraits<P1>::StorageType,
       typename internal::CallbackParamTraits<P2>::StorageType)> BindState;
+
+  COMPILE_ASSERT(internal::DefaultResultTag<Functor>::value && BindState::IsWeakCall::value ||
+    !BindState::IsWeakCall::value
+    , you_need_suplay_a_default_ret_value_for_weak_call);
 
   //internal::CallbackParamTraits<P1>::StorageType::IsWeakCall::value;
   return Callback<typename BindState::UnboundRunType>(
@@ -219,6 +223,9 @@ Bind(Functor functor, const P1& p1, const P2& p2, const P3& p3) {
       typename internal::CallbackParamTraits<P2>::StorageType,
       typename internal::CallbackParamTraits<P3>::StorageType)> BindState;
 
+  COMPILE_ASSERT(internal::DefaultResultTag<Functor>::value && BindState::IsWeakCall::value ||
+    !BindState::IsWeakCall::value
+    , you_need_suplay_a_default_ret_value_for_weak_call);
 
   return Callback<typename BindState::UnboundRunType>(
       new BindState(internal::MakeRunnable(functor), p1, p2, p3));
@@ -280,6 +287,9 @@ Bind(Functor functor, const P1& p1, const P2& p2, const P3& p3, const P4& p4) {
       typename internal::CallbackParamTraits<P3>::StorageType,
       typename internal::CallbackParamTraits<P4>::StorageType)> BindState;
 
+  COMPILE_ASSERT(internal::DefaultResultTag<Functor>::value && BindState::IsWeakCall::value ||
+    !BindState::IsWeakCall::value
+    , you_need_suplay_a_default_ret_value_for_weak_call);
 
   return Callback<typename BindState::UnboundRunType>(
       new BindState(internal::MakeRunnable(functor), p1, p2, p3, p4));
@@ -348,6 +358,9 @@ Bind(Functor functor, const P1& p1, const P2& p2, const P3& p3, const P4& p4,
       typename internal::CallbackParamTraits<P4>::StorageType,
       typename internal::CallbackParamTraits<P5>::StorageType)> BindState;
 
+  COMPILE_ASSERT(internal::DefaultResultTag<Functor>::value && BindState::IsWeakCall::value ||
+    !BindState::IsWeakCall::value
+    , you_need_suplay_a_default_ret_value_for_weak_call);
 
   return Callback<typename BindState::UnboundRunType>(
       new BindState(internal::MakeRunnable(functor), p1, p2, p3, p4, p5));
@@ -421,6 +434,9 @@ Bind(Functor functor, const P1& p1, const P2& p2, const P3& p3, const P4& p4,
       typename internal::CallbackParamTraits<P5>::StorageType,
       typename internal::CallbackParamTraits<P6>::StorageType)> BindState;
 
+  COMPILE_ASSERT(internal::DefaultResultTag<Functor>::value && BindState::IsWeakCall::value ||
+    !BindState::IsWeakCall::value
+    , you_need_suplay_a_default_ret_value_for_weak_call);
 
   return Callback<typename BindState::UnboundRunType>(
       new BindState(internal::MakeRunnable(functor), p1, p2, p3, p4, p5, p6));
@@ -499,6 +515,9 @@ Bind(Functor functor, const P1& p1, const P2& p2, const P3& p3, const P4& p4,
       typename internal::CallbackParamTraits<P6>::StorageType,
       typename internal::CallbackParamTraits<P7>::StorageType)> BindState;
 
+  COMPILE_ASSERT(internal::DefaultResultTag<Functor>::value && BindState::IsWeakCall::value ||
+    !BindState::IsWeakCall::value
+    , you_need_suplay_a_default_ret_value_for_weak_call);
 
   return Callback<typename BindState::UnboundRunType>(
       new BindState(internal::MakeRunnable(functor), p1, p2, p3, p4, p5, p6,

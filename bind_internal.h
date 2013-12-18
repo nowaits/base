@@ -677,19 +677,15 @@ class RunnableAdapter<R(T::*)(), false> {
   typedef R (RunType)(T*);
   typedef true_type IsMethod;
 
-  explicit RunnableAdapter(R(T::*method)())
-      : method_(method) {
+  explicit RunnableAdapter(R(T::*method)(), R default_value)
+      : method_(method), default_value_(default_value) {
   }
 
   R Run(T* object) {
     return (object->*method_)();
   }
 
-  R default_value() {return default_value_;}
-
-  void SetDefaultValue(R default_value) {
-    default_value_ = default_value;
-  }
+  const R& default_value() {return default_value_;}
 
  private:
    R (T::*method_)();
@@ -703,8 +699,8 @@ class RunnableAdapter<R(T::*)() const> {
   typedef R (RunType)(const T*);
   typedef true_type IsMethod;
 
-  explicit RunnableAdapter(R(T::*method)() const)
-      : method_(method) {
+  explicit RunnableAdapter(R(T::*method)() const, R default_value)
+      : method_(method), default_value_(default_value) {
   }
 
   R Run(const T* object) {
@@ -712,10 +708,6 @@ class RunnableAdapter<R(T::*)() const> {
   }
 
   const R& default_value() {return default_value_;}
-
-  void SetDefaultValue(R default_value) {
-    default_value_ = default_value;
-  }
 
  private:
    R (T::*method_)() const;
@@ -747,8 +739,8 @@ class RunnableAdapter<R(T::*)(A1)> {
   typedef R (RunType)(T*, A1);
   typedef true_type IsMethod;
 
-  explicit RunnableAdapter(R(T::*method)(A1))
-      : method_(method) {
+  explicit RunnableAdapter(R(T::*method)(A1), R default_value)
+      : method_(method), default_value_(default_value) {
   }
 
   R Run(T* object, typename CallbackParamTraits<A1>::ForwardType a1) {
@@ -756,10 +748,6 @@ class RunnableAdapter<R(T::*)(A1)> {
   }
 
   const R& default_value() {return default_value_;}
-
-  void SetDefaultValue(R default_value) {
-    default_value_ = default_value;
-  }
 
  private:
    R (T::*method_)(A1);
@@ -773,8 +761,8 @@ class RunnableAdapter<R(T::*)(A1) const> {
   typedef R (RunType)(const T*, A1);
   typedef true_type IsMethod;
 
-  explicit RunnableAdapter(R(T::*method)(A1) const)
-      : method_(method) {
+  explicit RunnableAdapter(R(T::*method)(A1) const, R default_value)
+      : method_(method), default_value_(default_value) {
   }
 
   R Run(const T* object, typename CallbackParamTraits<A1>::ForwardType a1) {
@@ -782,10 +770,6 @@ class RunnableAdapter<R(T::*)(A1) const> {
   }
 
   const R& default_value() {return default_value_;}
-
-  void SetDefaultValue(R default_value) {
-    default_value_ = default_value;
-  }
 
  private:
    R (T::*method_)(A1) const;
@@ -818,8 +802,8 @@ class RunnableAdapter<R(T::*)(A1, A2)> {
   typedef R (RunType)(T*, A1, A2);
   typedef true_type IsMethod;
 
-  explicit RunnableAdapter(R(T::*method)(A1, A2))
-      : method_(method) {
+  explicit RunnableAdapter(R(T::*method)(A1, A2), R default_value)
+      : method_(method), default_value_(default_value) {
   }
 
   R Run(T* object, typename CallbackParamTraits<A1>::ForwardType a1,
@@ -828,10 +812,6 @@ class RunnableAdapter<R(T::*)(A1, A2)> {
   }
 
   const R& default_value() {return default_value_;}
-
-  void SetDefaultValue(R default_value) {
-    default_value_ = default_value;
-  }
 
  private:
    R (T::*method_)(A1, A2);
@@ -845,8 +825,8 @@ class RunnableAdapter<R(T::*)(A1, A2) const> {
   typedef R (RunType)(const T*, A1, A2);
   typedef true_type IsMethod;
 
-  explicit RunnableAdapter(R(T::*method)(A1, A2) const)
-      : method_(method) {
+  explicit RunnableAdapter(R(T::*method)(A1, A2) const, R default_value)
+      : method_(method), default_value_(default_value) {
   }
 
   R Run(const T* object, typename CallbackParamTraits<A1>::ForwardType a1,
@@ -855,10 +835,6 @@ class RunnableAdapter<R(T::*)(A1, A2) const> {
   }
 
   const R& default_value() {return default_value_;}
-
-  void SetDefaultValue(R default_value) {
-    default_value_ = default_value;
-  }
 
  private:
    R (T::*method_)(A1, A2) const;
@@ -893,8 +869,8 @@ class RunnableAdapter<R(T::*)(A1, A2, A3)> {
   typedef R (RunType)(T*, A1, A2, A3);
   typedef true_type IsMethod;
 
-  explicit RunnableAdapter(R(T::*method)(A1, A2, A3))
-      : method_(method) {
+  explicit RunnableAdapter(R(T::*method)(A1, A2, A3), R default_value)
+      : method_(method), default_value_(default_value) {
   }
 
   R Run(T* object, typename CallbackParamTraits<A1>::ForwardType a1,
@@ -905,10 +881,6 @@ class RunnableAdapter<R(T::*)(A1, A2, A3)> {
   }
 
   const R& default_value() {return default_value_;}
-
-  void SetDefaultValue(R default_value) {
-    default_value_ = default_value;
-  }
 
  private:
    R (T::*method_)(A1, A2, A3);
@@ -922,8 +894,8 @@ class RunnableAdapter<R(T::*)(A1, A2, A3) const> {
   typedef R (RunType)(const T*, A1, A2, A3);
   typedef true_type IsMethod;
 
-  explicit RunnableAdapter(R(T::*method)(A1, A2, A3) const)
-      : method_(method) {
+  explicit RunnableAdapter(R(T::*method)(A1, A2, A3) const, R default_value)
+      : method_(method), default_value_(default_value) {
   }
 
   R Run(const T* object, typename CallbackParamTraits<A1>::ForwardType a1,
@@ -934,10 +906,6 @@ class RunnableAdapter<R(T::*)(A1, A2, A3) const> {
   }
 
   const R& default_value() {return default_value_;}
-
-  void SetDefaultValue(R default_value) {
-    default_value_ = default_value;
-  }
 
  private:
    R (T::*method_)(A1, A2, A3) const;
@@ -974,8 +942,8 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4)> {
   typedef R (RunType)(T*, A1, A2, A3, A4);
   typedef true_type IsMethod;
 
-  explicit RunnableAdapter(R(T::*method)(A1, A2, A3, A4))
-      : method_(method) {
+  explicit RunnableAdapter(R(T::*method)(A1, A2, A3, A4), R default_value)
+      : method_(method), default_value_(default_value) {
   }
 
   R Run(T* object, typename CallbackParamTraits<A1>::ForwardType a1,
@@ -987,10 +955,6 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4)> {
   }
 
   const R& default_value() {return default_value_;}
-
-  void SetDefaultValue(R default_value) {
-    default_value_ = default_value;
-  }
 
  private:
    R (T::*method_)(A1, A2, A3, A4);
@@ -1005,8 +969,8 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4) const> {
   typedef R (RunType)(const T*, A1, A2, A3, A4);
   typedef true_type IsMethod;
 
-  explicit RunnableAdapter(R(T::*method)(A1, A2, A3, A4) const)
-      : method_(method) {
+  explicit RunnableAdapter(R(T::*method)(A1, A2, A3, A4) const, R default_value)
+      : method_(method), default_value_(default_value) {
   }
 
   R Run(const T* object, typename CallbackParamTraits<A1>::ForwardType a1,
@@ -1018,10 +982,6 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4) const> {
   }
 
   const R& default_value() {return default_value_;}
-
-  void SetDefaultValue(R default_value) {
-    default_value_ = default_value;
-  }
 
  private:
    R (T::*method_)(A1, A2, A3, A4) const;
@@ -1060,8 +1020,8 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5)> {
   typedef R (RunType)(T*, A1, A2, A3, A4, A5);
   typedef true_type IsMethod;
 
-  explicit RunnableAdapter(R(T::*method)(A1, A2, A3, A4, A5))
-      : method_(method) {
+  explicit RunnableAdapter(R(T::*method)(A1, A2, A3, A4, A5), R default_value)
+      : method_(method), default_value_(default_value) {
   }
 
   R Run(T* object, typename CallbackParamTraits<A1>::ForwardType a1,
@@ -1074,10 +1034,6 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5)> {
   }
 
   const R& default_value() {return default_value_;}
-
-  void SetDefaultValue(R default_value) {
-    default_value_ = default_value;
-  }
 
  private:
    R (T::*method_)(A1, A2, A3, A4, A5);
@@ -1092,8 +1048,8 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5) const> {
   typedef R (RunType)(const T*, A1, A2, A3, A4, A5);
   typedef true_type IsMethod;
 
-  explicit RunnableAdapter(R(T::*method)(A1, A2, A3, A4, A5) const)
-      : method_(method) {
+  explicit RunnableAdapter(R(T::*method)(A1, A2, A3, A4, A5) const, R default_value)
+      : method_(method), default_value_(default_value) {
   }
 
   R Run(const T* object, typename CallbackParamTraits<A1>::ForwardType a1,
@@ -1106,10 +1062,6 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5) const> {
   }
 
   const R& default_value() {return default_value_;}
-
-  void SetDefaultValue(R default_value) {
-    default_value_ = default_value;
-  }
 
  private:
    R (T::*method_)(A1, A2, A3, A4, A5) const;
@@ -1150,8 +1102,8 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5, A6)> {
   typedef R (RunType)(T*, A1, A2, A3, A4, A5, A6);
   typedef true_type IsMethod;
 
-  explicit RunnableAdapter(R(T::*method)(A1, A2, A3, A4, A5, A6))
-      : method_(method) {
+  explicit RunnableAdapter(R(T::*method)(A1, A2, A3, A4, A5, A6), R default_value)
+      : method_(method), default_value_(default_value) {
   }
 
   R Run(T* object, typename CallbackParamTraits<A1>::ForwardType a1,
@@ -1167,10 +1119,6 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5, A6)> {
 
   const R& default_value() {return default_value_;}
 
-  void SetDefaultValue(R default_value) {
-    default_value_ = default_value;
-  }
-
  private:
    R (T::*method_)(A1, A2, A3, A4, A5, A6);
    R default_value_;
@@ -1184,8 +1132,8 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5, A6) const> {
   typedef R (RunType)(const T*, A1, A2, A3, A4, A5, A6);
   typedef true_type IsMethod;
 
-  explicit RunnableAdapter(R(T::*method)(A1, A2, A3, A4, A5, A6) const)
-      : method_(method) {
+  explicit RunnableAdapter(R(T::*method)(A1, A2, A3, A4, A5, A6) const, R default_value)
+      : method_(method), default_value_(default_value) {
   }
 
   R Run(const T* object, typename CallbackParamTraits<A1>::ForwardType a1,
@@ -1200,10 +1148,6 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5, A6) const> {
   }
 
   const R& default_value() {return default_value_;}
-
-  void SetDefaultValue(R default_value) {
-    default_value_ = default_value;
-  }
 
  private:
    R (T::*method_)(A1, A2, A3, A4, A5, A6) const;
@@ -1245,8 +1189,8 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5, A6, A7)> {
   typedef R (RunType)(T*, A1, A2, A3, A4, A5, A6, A7);
   typedef true_type IsMethod;
 
-  explicit RunnableAdapter(R(T::*method)(A1, A2, A3, A4, A5, A6, A7))
-      : method_(method) {
+  explicit RunnableAdapter(R(T::*method)(A1, A2, A3, A4, A5, A6, A7), R default_value)
+      : method_(method), default_value_(default_value) {
   }
 
   R Run(T* object, typename CallbackParamTraits<A1>::ForwardType a1,
@@ -1263,10 +1207,6 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5, A6, A7)> {
 
   const R& default_value() {return default_value_;}
 
-  void SetDefaultValue(R default_value) {
-    default_value_ = default_value;
-  }
-
  private:
    R (T::*method_)(A1, A2, A3, A4, A5, A6, A7);
    R default_value_;
@@ -1280,8 +1220,8 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5, A6, A7) const> {
   typedef R (RunType)(const T*, A1, A2, A3, A4, A5, A6, A7);
   typedef true_type IsMethod;
 
-  explicit RunnableAdapter(R(T::*method)(A1, A2, A3, A4, A5, A6, A7) const)
-      : method_(method) {
+  explicit RunnableAdapter(R(T::*method)(A1, A2, A3, A4, A5, A6, A7) const, R default_value)
+      : method_(method), default_value_(default_value) {
   }
 
   R Run(const T* object, typename CallbackParamTraits<A1>::ForwardType a1,
@@ -1297,10 +1237,6 @@ class RunnableAdapter<R(T::*)(A1, A2, A3, A4, A5, A6, A7) const> {
   }
 
   const R& default_value() {return default_value_;}
-
-  void SetDefaultValue(R default_value) {
-    default_value_ = default_value;
-  }
 
  private:
    R (T::*method_)(A1, A2, A3, A4, A5, A6, A7) const;
@@ -1480,68 +1416,110 @@ MakeRunnable(const IgnoreResultHelper<T>& t) {
   return MakeRunnable(t.functor_);
 }
 
+#if 0// TOMO unsupport reference return type
 template <typename T, typename M>
-typename FunctorTraits<T(M::*)()>::RunnableType
-  MakeRunnable(const DefaultResultHelper<T(M::*)(), T>& t) {
-    typename FunctorTraits<T(M::*)(), T>::RunnableType runnable = MakeRunnable(t.functor_);
-    runnable.SetDefaultValue(t.default_ret_);
-    return runnable;
+typename FunctorTraits<T&(M::*)(), T>::RunnableType
+  MakeRunnable(const DefaultResultHelper<T&(M::*)(), T>& t) {
+    return  RunnableAdapter<T&(M::*)()>(t.functor_, t.default_ret_);
 }
+#endif
+//////////////////////////////////////////////////////////////////////////
+// no const and no reference return type
+ template <typename T, typename M>
+ typename FunctorTraits<T(M::*)(), T>::RunnableType
+   MakeRunnable(const DefaultResultHelper<T(M::*)(), T>& t) {
+     return RunnableAdapter<T(M::*)()>(t.functor_, t.default_ret_);
+ }
 
 template <typename T, typename M, typename T1>
 typename FunctorTraits<T(M::*)(T1)>::RunnableType
 MakeRunnable(const DefaultResultHelper<T(M::*)(T1), T>& t) {
-  typename FunctorTraits<T(M::*)(T1), T>::RunnableType runnable = MakeRunnable(t.functor_);
-  runnable.SetDefaultValue(t.default_ret_);
-  return runnable;
+  return RunnableAdapter<T(M::*)(T1)>(t.functor_, t.default_ret_);
 }
 
 template <typename T, typename M, typename T1, typename T2>
 typename FunctorTraits<T(M::*)(T1, T2)>::RunnableType
 MakeRunnable(const DefaultResultHelper<T(M::*)(T1, T2), T>& t) {
-  typename FunctorTraits<T(M::*)(T1, T2), T>::RunnableType runnable = MakeRunnable(t.functor_);
-  runnable.SetDefaultValue(t.default_ret_);
-  return runnable;
+  return RunnableAdapter<T(M::*)(T1, T2)>(t.functor_, t.default_ret_);
 }
 
 template <typename T, typename M, typename T1, typename T2, typename T3>
 typename FunctorTraits<T(M::*)(T1, T2, T3)>::RunnableType
 MakeRunnable(const DefaultResultHelper<T(M::*)(T1, T2, T3), T>& t) {
-  typename FunctorTraits<T(M::*)(T1, T2, T3), T>::RunnableType runnable = MakeRunnable(t.functor_);
-  runnable.SetDefaultValue(t.default_ret_);
-  return runnable;
+  return RunnableAdapter<T(M::*)(T1, T2, T3)>(t.functor_, t.default_ret_);
 }
 
 template <typename T, typename M, typename T1, typename T2, typename T3, typename T4>
 typename FunctorTraits<T(M::*)(T1, T2, T3, T4)>::RunnableType
 MakeRunnable(const DefaultResultHelper<T(M::*)(T1, T2, T3, T4), T>& t) {
-  typename FunctorTraits<T(M::*)(T1, T2, T3, T4), T>::RunnableType runnable = MakeRunnable(t.functor_);
-  runnable.SetDefaultValue(t.default_ret_);
-  return runnable;
+  return RunnableAdapter<T(M::*)(T1, T2, T3, T4)>(t.functor_, t.default_ret_);
 }
 
 template <typename T, typename M, typename T1, typename T2, typename T3, typename T4, typename T5>
 typename FunctorTraits<T(M::*)(T1, T2, T3, T4, T5)>::RunnableType
 MakeRunnable(const DefaultResultHelper<T(M::*)(T1, T2, T3, T4, T5), T>& t) {
-  typename FunctorTraits<T(M::*)(T1, T2, T3, T4, T5), T>::RunnableType runnable = MakeRunnable(t.functor_);
-  runnable.SetDefaultValue(t.default_ret_);
-  return runnable;
+  return RunnableAdapter<T(M::*)(T1, T2, T3, T4, T5)>(t.functor_, t.default_ret_);
 }
 
 template <typename T, typename M, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
 typename FunctorTraits<T(M::*)(T1, T2, T3, T4, T5, T6)>::RunnableType
 MakeRunnable(const DefaultResultHelper<T(M::*)(T1, T2, T3, T4, T5, T6), T>& t) {
-  typename FunctorTraits<T(M::*)(T1, T2, T3, T4, T5, T6), T>::RunnableType runnable = MakeRunnable(t.functor_);
-  runnable.SetDefaultValue(t.default_ret_);
-  return runnable;
+  return RunnableAdapter<T(M::*)(T1, T2, T3, T4, T5, T6)>(t.functor_, t.default_ret_);
 }
 
 template <typename T, typename M, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
 typename FunctorTraits<T(M::*)(T1, T2, T3, T4, T5, T6, T7)>::RunnableType
 MakeRunnable(const DefaultResultHelper<T(M::*)(T1, T2, T3, T4, T5, T6, T7), T>& t) {
-  typename FunctorTraits<T(M::*)(T1, T2, T3, T4, T5, T6, T7), T>::RunnableType runnable = MakeRunnable(t.functor_);
-  runnable.SetDefaultValue(t.default_ret_);
-  return runnable;
+  return RunnableAdapter<T(M::*)(T1, T2, T3, T4, T5, T6, T7)>(t.functor_, t.default_ret_);
+}
+//////////////////////////////////////////////////////////////////////////
+// const return type
+template <typename T, typename M>
+typename FunctorTraits<const T(M::*)(), T>::RunnableType
+  MakeRunnable(const DefaultResultHelper<const T(M::*)(), T>& t) {
+    return RunnableAdapter<const T(M::*)()>(t.functor_, t.default_ret_);
+}
+
+template <typename T, typename M, typename T1>
+typename FunctorTraits<const T(M::*)(T1)>::RunnableType
+  MakeRunnable(const DefaultResultHelper<const T(M::*)(T1), T>& t) {
+    return RunnableAdapter<const T(M::*)(T1)>(t.functor_, t.default_ret_);
+}
+
+template <typename T, typename M, typename T1, typename T2>
+typename FunctorTraits<const T(M::*)(T1, T2)>::RunnableType
+  MakeRunnable(const DefaultResultHelper<const T(M::*)(T1, T2), T>& t) {
+    return RunnableAdapter<const T(M::*)(T1, T2)>(t.functor_, t.default_ret_);
+}
+
+template <typename T, typename M, typename T1, typename T2, typename T3>
+typename FunctorTraits<const T(M::*)(T1, T2, T3)>::RunnableType
+  MakeRunnable(const DefaultResultHelper<const T(M::*)(T1, T2, T3), T>& t) {
+    return RunnableAdapter<const T(M::*)(T1, T2, T3)>(t.functor_, t.default_ret_);
+}
+
+template <typename T, typename M, typename T1, typename T2, typename T3, typename T4>
+typename FunctorTraits<const T(M::*)(T1, T2, T3, T4)>::RunnableType
+  MakeRunnable(const DefaultResultHelper<const T(M::*)(T1, T2, T3, T4), T>& t) {
+    return RunnableAdapter<const T(M::*)(T1, T2, T3, T4)>(t.functor_, t.default_ret_);
+}
+
+template <typename T, typename M, typename T1, typename T2, typename T3, typename T4, typename T5>
+typename FunctorTraits<const T(M::*)(T1, T2, T3, T4, T5)>::RunnableType
+  MakeRunnable(const DefaultResultHelper<const T(M::*)(T1, T2, T3, T4, T5), T>& t) {
+    return RunnableAdapter<const T(M::*)(T1, T2, T3, T4, T5)>(t.functor_, t.default_ret_);
+}
+
+template <typename T, typename M, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+typename FunctorTraits<const T(M::*)(T1, T2, T3, T4, T5, T6)>::RunnableType
+  MakeRunnable(const DefaultResultHelper<const T(M::*)(T1, T2, T3, T4, T5, T6), T>& t) {
+    return RunnableAdapter<const T(M::*)(T1, T2, T3, T4, T5, T6)>(t.functor_, t.default_ret_);
+}
+
+template <typename T, typename M, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
+typename FunctorTraits<const T(M::*)(T1, T2, T3, T4, T5, T6, T7)>::RunnableType
+  MakeRunnable(const DefaultResultHelper<const T(M::*)(T1, T2, T3, T4, T5, T6, T7), T>& t) {
+    return RunnableAdapter<const T(M::*)(T1, T2, T3, T4, T5, T6, T7)>(t.functor_, t.default_ret_);
 }
 
 template <typename T>
@@ -1833,7 +1811,7 @@ struct InvokeHelper<true, ReturnType, Runnable, ArgsType> {
 // for weak ptr
 template <typename ReturnType, typename Runnable, typename A1>
 struct InvokeHelper<true, ReturnType, Runnable, void(A1)> {
-  static int MakeItSo(Runnable runnable, A1 a1) {
+  static ReturnType MakeItSo(Runnable runnable, A1 a1) {
       if (!a1.get()) {
         return runnable.default_value();
       }
@@ -1844,7 +1822,7 @@ struct InvokeHelper<true, ReturnType, Runnable, void(A1)> {
 
 template <typename ReturnType, typename Runnable, typename A1, typename A2>
 struct InvokeHelper<true, ReturnType, Runnable, void(A1, A2)> {
-  static int MakeItSo(Runnable runnable, A1 a1, A2 a2) {
+  static ReturnType MakeItSo(Runnable runnable, A1 a1, A2 a2) {
     if (!a1.get()) {
       return runnable.default_value();
     }
@@ -1855,7 +1833,7 @@ struct InvokeHelper<true, ReturnType, Runnable, void(A1, A2)> {
 
 template <typename ReturnType, typename Runnable, typename A1, typename A2, typename A3>
 struct InvokeHelper<true, ReturnType, Runnable, void(A1, A2, A3)> {
-  static int MakeItSo(Runnable runnable, A1 a1, A2 a2, A3 a3) {
+  static ReturnType MakeItSo(Runnable runnable, A1 a1, A2 a2, A3 a3) {
     if (!a1.get()) {
       return runnable.default_value();
     }
@@ -1866,7 +1844,7 @@ struct InvokeHelper<true, ReturnType, Runnable, void(A1, A2, A3)> {
 
 template <typename ReturnType, typename Runnable, typename A1, typename A2, typename A3, typename A4>
 struct InvokeHelper<true, ReturnType, Runnable, void(A1, A2, A3, A4)> {
-  static int MakeItSo(Runnable runnable, A1 a1, A2 a2, A3 a3, A4 a4) {
+  static ReturnType MakeItSo(Runnable runnable, A1 a1, A2 a2, A3 a3, A4 a4) {
     if (!a1.get()) {
       return runnable.default_value();
     }
@@ -1878,7 +1856,7 @@ struct InvokeHelper<true, ReturnType, Runnable, void(A1, A2, A3, A4)> {
 template <typename ReturnType, typename Runnable, typename A1, typename A2, typename A3, typename A4
 , typename A5>
 struct InvokeHelper<true, ReturnType, Runnable, void(A1, A2, A3, A4, A5)> {
-  static int MakeItSo(Runnable runnable, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5) {
+  static ReturnType MakeItSo(Runnable runnable, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5) {
     if (!a1.get()) {
       return runnable.default_value();
     }
@@ -1891,7 +1869,7 @@ struct InvokeHelper<true, ReturnType, Runnable, void(A1, A2, A3, A4, A5)> {
 template <typename ReturnType, typename Runnable, typename A1, typename A2, typename A3, typename A4
 , typename A5, typename A6>
 struct InvokeHelper<true, ReturnType, Runnable, void(A1, A2, A3, A4, A5, A6)> {
-  static int MakeItSo(Runnable runnable, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6) {
+  static ReturnType MakeItSo(Runnable runnable, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6) {
     if (!a1.get()) {
       return runnable.default_value();
     }
@@ -1904,7 +1882,7 @@ struct InvokeHelper<true, ReturnType, Runnable, void(A1, A2, A3, A4, A5, A6)> {
 template <typename ReturnType, typename Runnable, typename A1, typename A2, typename A3, typename A4
 , typename A5, typename A6, typename A7>
 struct InvokeHelper<true, ReturnType, Runnable, void(A1, A2, A3, A4, A5, A6, A7)> {
-  static int MakeItSo(Runnable runnable, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7) {
+  static ReturnType MakeItSo(Runnable runnable, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7) {
     if (!a1.get()) {
       return runnable.default_value();
     }
@@ -1982,10 +1960,19 @@ struct Invoker<1, StorageType, R(X1)> {
 
     typename Bound1UnwrapTraits::ForwardType x1 =
         Bound1UnwrapTraits::Unwrap(storage->p1_);
+
+
+#if 0
+    char y = 'a';
+    R x = y;
+    COMPILE_ASSERT(IS_EQUE_TYPE(x, 0), a000);
+    return 0;
+#else
     return InvokeHelper<StorageType::IsWeakCall::value, R,
            typename StorageType::RunnableType,
            void(typename Bound1UnwrapTraits::ForwardType)>
                ::MakeItSo(storage->runnable_, CallbackForward(x1));
+#endif
   }
 };
 

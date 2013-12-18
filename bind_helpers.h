@@ -321,16 +321,37 @@ struct IgnoreResultHelper {
 
 template <typename T, typename R>
 struct DefaultResultHelper {
+  typedef char IsDefaultResultHelper;
+
   explicit DefaultResultHelper(T functor, R default_ret) 
     : functor_(functor), default_ret_(default_ret) {
-#if 1// TOMO const type detect
+     
+#if 0// TOMO const type detect
       COMPILE_ASSERT(IS_RET_TYPE_OK(functor, default_ret), 
         default_ret_type_and_fuck_return_type_is_not_matched);
+#else
+      COMPILE_ASSERT(!IS_VOID_TYPE(functor), 
+        function_should_be_a_return_value_type);
 #endif
   }
 
   T functor_;
   R default_ret_;
+};
+
+template <typename T>
+class DefaultResultTag {
+  typedef char Yes[1];
+  typedef char No[2];
+
+  template <typename U>
+  static Yes& Check(typename U::IsDefaultResultHelper*);
+
+  template <typename U>
+  static No& Check(...);
+
+public:
+  static const bool value = sizeof(Check<T>(0)) == sizeof(Yes);
 };
 
 template <typename T>
