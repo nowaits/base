@@ -35,7 +35,31 @@
 #include "base\linked_list.h"
 #include "base\function_type\func_type.h"
 #include "base\function_type\type.h"
+//////////////////////////////////////////////////////////////////////////
+class Number 
+{
+public:
+  Number& operator++ ()     // prefix ++
+  {
+    // Do work on this.
+    return *this;
+  }
 
+  // You want to make the ++ operator work like the standard operators
+  // The simple way to do this is to implement postfix in terms of prefix.
+  //
+  Number  operator++ (int)  // postfix ++
+  {
+    Number result(*this);   // make a copy for result
+    ++(*this);              // Now use the prefix version to do the work
+    return result;          // return the copy (the old) value.
+  }
+}; 
+
+UNIT_TEST(Number) {
+  Number n;
+  n++;
+}
 //////////////////////////////////////////////////////////////////////////
 class PODClass {
 public:
