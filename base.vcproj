@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".."
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;OS_WIN"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -271,16 +271,53 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="synchronization"
+			>
+			<File
+				RelativePath=".\synchronization\cancellation_flag.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\synchronization\cancellation_flag.h"
+				>
+			</File>
+			<File
+				RelativePath=".\synchronization\condition_variable.h"
+				>
+			</File>
+			<File
+				RelativePath=".\synchronization\condition_variable_win.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\synchronization\lock.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\synchronization\lock.h"
+				>
+			</File>
+			<File
+				RelativePath=".\synchronization\lock_impl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\synchronization\lock_impl_win.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\synchronization\waitable_event.h"
+				>
+			</File>
+			<File
+				RelativePath=".\synchronization\waitable_event_win.cc"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\at_exit.cc"
 			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-				/>
-			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\at_exit.h"
