@@ -51,10 +51,9 @@ UNIT_TEST(VNCSigslotTest) {
   sigslot::signal2<int, char> SignalJingleInfo;
   SignalJingleInfo.connect(p.get(), &VNCSigslotTest::Fun);
   SignalJingleInfo.emit(3, 'a');
-  //SignalJingleInfo.disconnect(p.get());
+  SignalJingleInfo(5, 's');
+  SignalJingleInfo.disconnect(p.get());
 
-
-  p->signal_disconnect(&SignalJingleInfo);
   SignalJingleInfo.emit(3, 'a');
   SignalJingleInfo.emit(4, 'b');
 }
