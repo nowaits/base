@@ -415,6 +415,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\sigslot.h"
+			>
+		</File>
+		<File
 			RelativePath=".\stack_container.h"
 			>
 		</File>

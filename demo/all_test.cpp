@@ -1,3 +1,5 @@
+// UNIT_TEST(VNCSigslotTest)
+// UNIT_TEST(postfix)
 // UNIT_TEST(placement_new)
 // UNIT_TEST(POD)
 // UNIT_TEST(SingletonTest)
@@ -35,6 +37,27 @@
 #include "base\linked_list.h"
 #include "base\function_type\func_type.h"
 #include "base\function_type\type.h"
+#include "base\sigslot.h"
+//////////////////////////////////////////////////////////////////////////
+class VNCSigslotTest : public sigslot::has_slots<> {
+public:
+  void Fun(int a, char c) {
+  }
+};
+
+UNIT_TEST(VNCSigslotTest) {
+
+  scoped_ptr<VNCSigslotTest> p(new VNCSigslotTest);
+  sigslot::signal2<int, char> SignalJingleInfo;
+  SignalJingleInfo.connect(p.get(), &VNCSigslotTest::Fun);
+  SignalJingleInfo.emit(3, 'a');
+  //SignalJingleInfo.disconnect(p.get());
+
+
+  p->signal_disconnect(&SignalJingleInfo);
+  SignalJingleInfo.emit(3, 'a');
+  SignalJingleInfo.emit(4, 'b');
+}
 //////////////////////////////////////////////////////////////////////////
 class Number 
 {
@@ -56,7 +79,7 @@ public:
   }
 }; 
 
-UNIT_TEST(Number) {
+UNIT_TEST(postfix) {
   Number n;
   n++;
 }
