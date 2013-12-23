@@ -13,6 +13,9 @@ UNIT_TEST(test_case_name) {
   type(const type &);\
   void operator=(const type &)
 
+#define _DATA_TO_STRING(num) ""#num
+#define DATA_TO_STRING(num) _DATA_TO_STRING(num)
+
 class Unitqueue {
 public:
   class Delegate {
@@ -65,8 +68,11 @@ public:\
   virtual void TestBody();\
 private:\
   static const unit_case_name##_Test* test_init_;\
+  static const char* kDebugInfo;\
   GTEST_DISALLOW_COPY_AND_ASSIGN(unit_case_name##_Test);\
 };\
   const unit_case_name##_Test* unit_case_name##_Test::test_init_ \
   = new unit_case_name##_Test;\
+  const char* unit_case_name##_Test::kDebugInfo = \
+  __FILE__"ги"DATA_TO_STRING(__LINE__)")";\
   void unit_case_name##_Test::TestBody()
