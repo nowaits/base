@@ -39,6 +39,14 @@
 #include "base\function_type\type.h"
 #include "base\sigslot.h"
 //////////////////////////////////////////////////////////////////////////
+const char* g_buildTime = "Built on " __DATE__ " at " __TIME__;
+
+UNIT_TEST(g_buildTime) {
+  const char* fun1 = __FUNCDNAME__; 
+  const char* fun2 = __FUNCTION__;
+  const char* fun3 = __FUNCSIG__;
+}
+//////////////////////////////////////////////////////////////////////////
 class VNCSigslotTest : public sigslot::has_slots<> {
 public:
   void Fun(int a, char c) {
