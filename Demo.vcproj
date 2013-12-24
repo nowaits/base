@@ -180,13 +180,6 @@
 			<File
 				RelativePath=".\demo\all_test.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\demo\bind_weak_ptr_test.cc"
@@ -240,6 +233,18 @@
 			</File>
 			<File
 				RelativePath=".\function_type\type.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="third"
+			>
+			<File
+				RelativePath=".\third\circularbuffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\third\circularbuffer.h"
 				>
 			</File>
 		</Filter>
