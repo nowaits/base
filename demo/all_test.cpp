@@ -39,6 +39,23 @@
 #include "base\function_type\type.h"
 #include "base\sigslot.h"
 //////////////////////////////////////////////////////////////////////////
+#include "base\third\circularbuffer.h"
+#include <stdlib.h>
+
+UNIT_TEST(CircularBuffer) {
+  vncjingle::CircularBuffer buffer(100);
+  char bu[] = "If you need to make more extensive configuration changes - more than one or two";
+  char buf[100] = {0};
+  assert(buffer.Length() == 0);
+
+  assert(buffer.Read(buf, 10, false, false) == false);
+
+  buffer.Write(bu, _countof(bu));
+
+  assert(buffer.Read(buf, 10, false, false) == true);
+  assert(buffer.AvailableCapacity() == 100 - _countof(bu) + 10);
+}
+//////////////////////////////////////////////////////////////////////////
 const char* g_buildTime = "Built on " __DATE__ " at " __TIME__;
 
 UNIT_TEST(g_buildTime) {
