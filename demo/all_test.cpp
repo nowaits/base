@@ -38,6 +38,7 @@
 #include "base\function_type\func_type.h"
 #include "base\function_type\type.h"
 #include "base\sigslot.h"
+#include <fstream>
 //////////////////////////////////////////////////////////////////////////
 struct REFERANCE_TYPE {
   REFERANCE_TYPE(int& x) : x_(x){};
@@ -53,6 +54,39 @@ UNIT_TEST(referance_type) {
   t.x_ = 323;
   assert(x == 323);
   assert(&x == &t.x_);
+}
+//////////////////////////////////////////////////////////////////////////
+class _log{
+public:
+  _log(std::ofstream& lg);
+  ~_log();
+
+  std::ofstream& logStream();
+private:
+  std::ofstream& lg_;
+};
+
+_log::_log(std::ofstream& lg): lg_(lg) {
+  SYSTEMTIME tm;
+  ::GetLocalTime(&tm);
+
+  lg_<<"["<<tm.wHour<<":"<<tm.wMinute<<":"<<tm.wSecond<<"]:<";
+}
+
+_log::~_log(){
+  lg_<<std::endl;
+}
+
+std::ofstream& _log::logStream(){
+  return lg_;
+}
+//////////////////////////////////////////////////////////////////////////
+std::ofstream lg("SLOG.log");
+
+#define SLOG (_log(lg).logStream()<<__FUNCTION__<<":("<<__LINE__<<")>::")
+UNIT_TEST(SLOG) {
+  SLOG<<"hello";
+  SLOG<<"hellso";
 }
 //////////////////////////////////////////////////////////////////////////
 #include "base\third\circularbuffer.h"
