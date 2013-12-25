@@ -39,6 +39,21 @@
 #include "base\function_type\type.h"
 #include "base\sigslot.h"
 //////////////////////////////////////////////////////////////////////////
+struct REFERANCE_TYPE {
+  REFERANCE_TYPE(int& x) : x_(x){};
+  int& x_;
+};
+UNIT_TEST(referance_type) {
+
+  int x = 9;
+  REFERANCE_TYPE t(x);
+  x = 32;
+
+  assert(t.x_ == 32);
+  t.x_ = 323;
+  assert(x == 323);
+}
+//////////////////////////////////////////////////////////////////////////
 #include "base\third\circularbuffer.h"
 #include <stdlib.h>
 
