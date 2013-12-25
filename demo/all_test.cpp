@@ -56,38 +56,47 @@ UNIT_TEST(referance_type) {
   assert(&x == &t.x_);
 }
 //////////////////////////////////////////////////////////////////////////
-class _log{
-public:
-  _log(std::ofstream& lg);
-  ~_log();
 
-  std::ofstream& logStream();
+class _log 
+  : public std::stringstream{
+public:
+  _log(std::fstream& file_steam, bool force_to_file = false)
+    : file_steam_(file_steam), force_to_file_(force_to_file) {
+    SYSTEMTIME tm;
+    ::GetLocalTime(&tm);
+    logStream()<<"["<<tm.wHour<<":"<<tm.wMinute<<":"<<tm.wSecond<<"]:<";
+  }
+
+  ~_log() {
+    logStream()<<std::endl;
+
+    if (force_to_file_ || 
+      ::IsDebuggerPresent() == FALSE) 
+      file_steam_<<str();
+    else
+      ::OutputDebugStringA(str().c_str());
+  }
+
+  std::iostream& logStream() {
+    return *this;
+  }
+
 private:
-  std::ofstream& lg_;
+  bool            force_to_file_;
+  std::fstream&   file_steam_;
 };
 
-_log::_log(std::ofstream& lg): lg_(lg) {
-  SYSTEMTIME tm;
-  ::GetLocalTime(&tm);
+std::fstream file_steam("SLOG.log", std::ios::trunc|std::ios::out);
 
-  lg_<<"["<<tm.wHour<<":"<<tm.wMinute<<":"<<tm.wSecond<<"]:<";
-}
-
-_log::~_log(){
-  lg_<<std::endl;
-}
-
-std::ofstream& _log::logStream(){
-  return lg_;
-}
 //////////////////////////////////////////////////////////////////////////
-std::ofstream lg("SLOG.log");
+#define SVLOG (_log(file_steam, true).logStream()<<__FUNCTION__<<":("<<__LINE__<<")>::")
 
-#define SLOG (_log(lg).logStream()<<__FUNCTION__<<":("<<__LINE__<<")>::")
+#define SLOG (_log(file_steam).logStream()<<__FUNCTION__<<":("<<__LINE__<<")>::")
 UNIT_TEST(SLOG) {
   SLOG<<"hello";
   SLOG<<"hellso";
 }
+
 //////////////////////////////////////////////////////////////////////////
 #include "base\third\circularbuffer.h"
 #include <stdlib.h>
