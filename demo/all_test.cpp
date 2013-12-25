@@ -52,6 +52,7 @@ UNIT_TEST(referance_type) {
   assert(t.x_ == 32);
   t.x_ = 323;
   assert(x == 323);
+  assert(&x == &t.x_);
 }
 //////////////////////////////////////////////////////////////////////////
 #include "base\third\circularbuffer.h"
