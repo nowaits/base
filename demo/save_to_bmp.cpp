@@ -4,6 +4,8 @@
 #include <fstream>
 
 void SaveImgToFile(const std::string& file_name, int w, int h, int bit_count, const unsigned char* bytes) {
+  unsigned long data_size = std::abs((w * h)) * bit_count / 8;
+
   BITMAPINFO bi = {0}; 
   bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
   bi.bmiHeader.biWidth = w;
@@ -14,13 +16,13 @@ void SaveImgToFile(const std::string& file_name, int w, int h, int bit_count, co
   BITMAPFILEHEADER bh = {0};
   bh.bfType = 0x4d42;  //bitmap  
   bh.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
-  bh.bfSize = bh.bfOffBits + ((bi.bmiHeader.biWidth * bi.bmiHeader.biHeight) * bi.bmiHeader.biBitCount / 8);
+  bh.bfSize = bh.bfOffBits + data_size;
 
   {
    std::ofstream fs(file_name, std::ios::binary|std::ios::trunc);
    fs.write((const char*)&bh, sizeof(BITMAPFILEHEADER));
    fs.write((const char*)&(bi.bmiHeader), sizeof(BITMAPINFOHEADER));
-   fs.write((const char*)bytes, (bi.bmiHeader.biWidth * bi.bmiHeader.biHeight) * bi.bmiHeader.biBitCount / 8);
+   fs.write((const char*)bytes, data_size);
   }
 }
 
