@@ -40,6 +40,18 @@
 #include "base\sigslot.h"
 #include <fstream>
 //////////////////////////////////////////////////////////////////////////
+void CALLBACK time_proc(HWND hwnd, UINT uMsg, UINT_PTR id, DWORD t) {
+  ::PostMessage(NULL, WM_QUIT, 0, 0);
+}
+UNIT_TEST(time_proc) {
+  int t = ::SetTimer(NULL, 0, 100, time_proc);
+
+  MSG msg;          // message structure 
+  while (GetMessage(&msg, NULL, 0, 0) != 0) { 
+    DispatchMessage(&msg);
+  }
+}
+//////////////////////////////////////////////////////////////////////////
 struct REFERANCE_TYPE {
   REFERANCE_TYPE(int& x) : x_(x){};
   int& x_;
