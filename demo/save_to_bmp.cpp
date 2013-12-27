@@ -19,14 +19,15 @@ void SaveImgToFile(const std::string& file_name, int w, int h, int bit_count, co
   bh.bfSize = bh.bfOffBits + data_size;
 
   {
-   std::ofstream fs(file_name.c_str(), std::ios::binary|std::ios::trunc);
-   fs.write((const char*)&bh, sizeof(BITMAPFILEHEADER));
-   fs.write((const char*)&(bi.bmiHeader), sizeof(BITMAPINFOHEADER));
-   fs.write((const char*)bytes, data_size);
+    std::ofstream fs(file_name.c_str(), std::ios::binary|std::ios::trunc);
+    fs.write((const char*)&bh, sizeof(BITMAPFILEHEADER));
+    fs.write((const char*)&(bi.bmiHeader), sizeof(BITMAPINFOHEADER));
+    fs.write((const char*)bytes, data_size);
   }
 }
 
 void CaptureScreenToFile(const std::string& file_name) {
+  ::GdiFlush();
   HDC hScrDC = ::GetDC(NULL);
   HDC hMemDC = NULL;
 
@@ -50,21 +51,46 @@ void CaptureScreenToFile(const std::string& file_name) {
       DeleteObject(IconInfo.hbmColor);
   }
 
-  BITMAPINFO bi = {0}; 
-  bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-  bi.bmiHeader.biWidth = nWidth;
-  bi.bmiHeader.biHeight = nHeight;
-  bi.bmiHeader.biPlanes = 1;
-  bi.bmiHeader.biBitCount = 24;
+  BITMAPINFO* bi = (BITMAPINFO*)::malloc(sizeof(BITMAPINFOHEADER));
 
-  HBITMAP bitmap = ::CreateDIBSection(hMemDC, &bi, DIB_RGB_COLORS, (LPVOID*)&lpBitmapBits, NULL, 0);
+  HBITMAP bitmap = NULL;
+
+  {
+    bitmap = CreateCompatibleBitmap(
+      hScrDC, nWidth, nHeight);
+
+    bi->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bi->bmiHeader.biBitCount = 0;
+
+    int result = ::GetDIBits(hMemDC, bitmap, 0, 0, NULL, bi, DIB_RGB_COLORS);
+
+    if (!result)
+      return;
+
+    if (bi->bmiHeader.biBitCount == 32) {
+      bi = (BITMAPINFO*)::realloc(bi, sizeof(BITMAPINFOHEADER) +  3 * sizeof(RGBQUAD));
+    }
+
+    result = ::GetDIBits(hMemDC, bitmap, 0, 0, NULL, bi, DIB_RGB_COLORS);
+
+    if (!result)
+      return;
+
+    DeleteObject(bitmap);
+
+    bitmap = 
+      CreateDIBSection(hMemDC, bi, DIB_RGB_COLORS, (LPVOID*)&lpBitmapBits, NULL, 0);
+
+    ::free(bi);
+  }
+
   HGDIOBJ oldbmp = ::SelectObject(hMemDC, bitmap); 
 
   ::BitBlt(hMemDC, 0, 0, nWidth, nHeight, hScrDC, 0, 0, SRCCOPY|CAPTUREBLT);
   ::DrawIconEx(hMemDC, hCursorInfo.ptScreenPos.x, hCursorInfo.ptScreenPos.y, 
     hCursorInfo.hCursor, 0, 0, 0, NULL, DI_NORMAL );
 
-  SaveImgToFile(file_name, nWidth, nHeight, 24, lpBitmapBits);
+  SaveImgToFile(file_name, nWidth, nHeight, bi->bmiHeader.biBitCount, lpBitmapBits);
 
   ::SelectObject(hMemDC, oldbmp);
   ::DeleteObject(bitmap);
@@ -73,6 +99,6 @@ void CaptureScreenToFile(const std::string& file_name) {
 }
 
 UNIT_TEST(save_to_bmp) {
-  std::string file_name = "c:\\b.bmp";
+  std::string file_name = "c:\\sb.bmp";
   CaptureScreenToFile(file_name);
 }
