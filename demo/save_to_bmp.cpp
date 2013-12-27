@@ -33,8 +33,11 @@ void CaptureScreenToFile(const std::string& file_name) {
 
   const unsigned char *lpBitmapBits = NULL; 
 
-  int nWidth = GetSystemMetrics(SM_CXSCREEN);
-  int nHeight = GetSystemMetrics(SM_CYSCREEN); 
+  RECT screenrect;
+  screenrect.left		= GetSystemMetrics(SM_XVIRTUALSCREEN);
+  screenrect.top		= GetSystemMetrics(SM_YVIRTUALSCREEN);
+  screenrect.right	= screenrect.left + GetSystemMetrics(SM_CXVIRTUALSCREEN);
+  screenrect.bottom	= screenrect.top + GetSystemMetrics(SM_CYVIRTUALSCREEN);
 
   hMemDC = ::CreateCompatibleDC(hScrDC); 
 
@@ -57,7 +60,9 @@ void CaptureScreenToFile(const std::string& file_name) {
 
   {
     bitmap = CreateCompatibleBitmap(
-      hScrDC, nWidth, nHeight);
+      hScrDC, 
+      screenrect.right - screenrect.left, 
+      screenrect.bottom - screenrect.top);
 
     bi->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     bi->bmiHeader.biBitCount = 0;
@@ -67,8 +72,10 @@ void CaptureScreenToFile(const std::string& file_name) {
     if (!result)
       return;
 
-    if (bi->bmiHeader.biBitCount == 32) {
-      bi = (BITMAPINFO*)::realloc(bi, sizeof(BITMAPINFOHEADER) +  3 * sizeof(RGBQUAD));
+    if ((GetDeviceCaps(hMemDC, RASTERCAPS) & RC_PALETTE) == 0) {// Õæ²Ê
+      if (bi->bmiHeader.biBitCount == 32) {
+        bi = (BITMAPINFO*)::realloc(bi, sizeof(BITMAPINFOHEADER) +  3 * sizeof(RGBQUAD));
+      }
     }
 
     result = ::GetDIBits(hMemDC, bitmap, 0, 0, NULL, bi, DIB_RGB_COLORS);
@@ -80,22 +87,27 @@ void CaptureScreenToFile(const std::string& file_name) {
 
     bitmap = 
       CreateDIBSection(hMemDC, bi, DIB_RGB_COLORS, (LPVOID*)&lpBitmapBits, NULL, 0);
-
-    ::free(bi);
   }
 
   HGDIOBJ oldbmp = ::SelectObject(hMemDC, bitmap); 
 
-  ::BitBlt(hMemDC, 0, 0, nWidth, nHeight, hScrDC, 0, 0, SRCCOPY|CAPTUREBLT);
+  ::BitBlt(hMemDC, 0, 0,
+    screenrect.right - screenrect.left,
+    screenrect.bottom - screenrect.top, 
+    hScrDC, 0, 0, SRCCOPY|CAPTUREBLT);
   ::DrawIconEx(hMemDC, hCursorInfo.ptScreenPos.x, hCursorInfo.ptScreenPos.y, 
     hCursorInfo.hCursor, 0, 0, 0, NULL, DI_NORMAL );
 
-  SaveImgToFile(file_name, nWidth, nHeight, bi->bmiHeader.biBitCount, lpBitmapBits);
+  SaveImgToFile(file_name,
+    screenrect.right - screenrect.left,
+    screenrect.bottom - screenrect.top,
+    bi->bmiHeader.biBitCount, lpBitmapBits);
 
   ::SelectObject(hMemDC, oldbmp);
   ::DeleteObject(bitmap);
   ::DeleteObject(hMemDC);
   ::ReleaseDC(NULL, hScrDC);
+  ::free(bi);
 }
 
 UNIT_TEST(save_to_bmp) {
