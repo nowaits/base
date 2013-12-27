@@ -28,9 +28,42 @@ void SaveImgToFile(const std::string& file_name, BITMAPINFO* lpbi, const unsigne
   }
 }
 
-void CaptureScreenToFile(const std::string& file_name) {
+bool LoadBmp(const std::string& file_name, BITMAPFILEHEADER& bh,
+             std::string& info_buffer, std::string& data_buffer) {
+
+   std::ifstream ifs(file_name.c_str(), std::ios::binary);
+   ifs.exceptions( std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit );  
+
+   int current_pos = ifs.tellg();
+   ifs.seekg(0, std::ios_base::end);
+   unsigned long file_size = ifs.tellg();
+   ifs.seekg(current_pos);
+
+   ifs.read((char *)&bh, sizeof(BITMAPFILEHEADER));
+   int i = ifs.gcount();
+
+   if (bh.bfType != 0x4d42)
+     return false;
+
+   if (file_size != bh.bfSize)
+     return false;
+
+   info_buffer.resize(bh.bfOffBits - sizeof(BITMAPFILEHEADER));
+
+   ifs.read(&info_buffer[0], (long)info_buffer.size());
+  
+   BITMAPINFOHEADER* bmp_header = reinterpret_cast<BITMAPINFOHEADER*>(&info_buffer[0]);
+
+   data_buffer.resize(bmp_header->biWidth * bmp_header->biHeight * bmp_header->biBitCount / 8);
+
+   ifs.seekg(bh.bfOffBits);
+
+   ifs.read(&data_buffer[0], (long)data_buffer.size());
+   return true;
+}
+
+bool CaptureScreenToFile(const std::string& file_name, HDC hScrDC = ::GetDC(NULL)) {
   ::GdiFlush();
-  HDC hScrDC = ::GetDC(NULL);
   HDC hMemDC = NULL;
 
   const unsigned char *lpBitmapBits = NULL; 
@@ -71,7 +104,7 @@ void CaptureScreenToFile(const std::string& file_name) {
     int result = ::GetDIBits(hMemDC, bitmap, 0, 0, NULL, (LPBITMAPINFO)&bmpinfo, DIB_RGB_COLORS);
 
     if (!result)
-      return;
+      return false;
 
     if ((GetDeviceCaps(hMemDC, RASTERCAPS) & RC_PALETTE) == 0) {//Õæ²Ê
       assert(bmpinfo.bmiHeader.biBitCount == 32);
@@ -80,7 +113,7 @@ void CaptureScreenToFile(const std::string& file_name) {
     result = ::GetDIBits(hMemDC, bitmap, 0, 0, NULL, (LPBITMAPINFO)&bmpinfo, DIB_RGB_COLORS);
 
     if (!result)
-      return;
+      return false;
 
     DeleteObject(bitmap);
 
@@ -103,9 +136,49 @@ void CaptureScreenToFile(const std::string& file_name) {
   ::DeleteObject(bitmap);
   ::DeleteObject(hMemDC);
   ::ReleaseDC(NULL, hScrDC);
+
+  return true;
+}
+
+bool SetDIBToSdevice(HDC dc, const std::string& file_name) {
+
+  BITMAPFILEHEADER bh;
+  LPBITMAPINFO lpbmi;
+  std::string info_buffer;
+  std::string data_buffer;
+
+  if (!LoadBmp(file_name, bh, info_buffer, data_buffer))
+    return false;
+
+  if (info_buffer.empty() || data_buffer.empty())
+    return false;
+
+  lpbmi = reinterpret_cast<LPBITMAPINFO>(&info_buffer[0]);
+
+  if (lpbmi->bmiHeader.biBitCount != 24 && lpbmi->bmiHeader.biBitCount != 32)
+    return false;
+
+  return ::SetDIBitsToDevice(dc, 0, 0,
+    lpbmi->bmiHeader.biWidth, lpbmi->bmiHeader.biHeight,
+    0, 0, 0, -(lpbmi->bmiHeader.biHeight), (LPVOID*)&data_buffer[0], 
+    lpbmi, DIB_RGB_COLORS) != 0;
 }
 
 UNIT_TEST(save_to_bmp) {
-  std::string file_name = "c:\\sb.bmp";
-  CaptureScreenToFile(file_name);
+  std::string file_name_a = "c:\\a.bmp";
+  std::string file_name_b = "c:\\b.bmp";
+  HDC hScreen = ::GetDC(NULL);
+  HDC hMemDc = CreateCompatibleDC(hScreen);
+
+  HBITMAP bitmap =
+    CreateCompatibleBitmap(
+      hScreen, 
+      1280, 800);
+  HBITMAP old_bmp = (HBITMAP)::SelectObject(hMemDc, bitmap);
+
+  assert(CaptureScreenToFile(file_name_a));
+  assert(SetDIBToSdevice(hMemDc, file_name_a));
+  assert(CaptureScreenToFile(file_name_b, hMemDc));
+
+  ::ReleaseDC(NULL, hScreen);
 }
