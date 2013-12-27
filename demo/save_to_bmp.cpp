@@ -2,26 +2,28 @@
 #include <WinError.h>
 #include "base\test\unit_test.h"
 #include <fstream>
+#include <assert.h>
 
-void SaveImgToFile(const std::string& file_name, int w, int h, int bit_count, const unsigned char* bytes) {
-  unsigned long data_size = std::abs((w * h)) * bit_count / 8;
+struct BMPINFO{
+  BITMAPINFOHEADER    bmiHeader;
+  RGBQUAD             bmiColors[256];
+};
 
-  BITMAPINFO bi = {0}; 
-  bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-  bi.bmiHeader.biWidth = w;
-  bi.bmiHeader.biHeight = h;
-  bi.bmiHeader.biPlanes = 1;
-  bi.bmiHeader.biBitCount = bit_count;
+void SaveImgToFile(const std::string& file_name, BITMAPINFO* lpbi, const unsigned char* bytes) {
+  unsigned long data_size = 
+    std::abs((lpbi->bmiHeader.biWidth * lpbi->bmiHeader.biHeight))
+    * lpbi->bmiHeader.biBitCount / 8;
 
   BITMAPFILEHEADER bh = {0};
   bh.bfType = 0x4d42;  //bitmap  
-  bh.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+  bh.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + 256 * sizeof(RGBQUAD);
   bh.bfSize = bh.bfOffBits + data_size;
 
   {
     std::ofstream fs(file_name.c_str(), std::ios::binary|std::ios::trunc);
     fs.write((const char*)&bh, sizeof(BITMAPFILEHEADER));
-    fs.write((const char*)&(bi.bmiHeader), sizeof(BITMAPINFOHEADER));
+    fs.write((const char*)(lpbi),
+      sizeof(BITMAPINFOHEADER) + 256 * sizeof(RGBQUAD));
     fs.write((const char*)bytes, data_size);
   }
 }
@@ -54,31 +56,28 @@ void CaptureScreenToFile(const std::string& file_name) {
       DeleteObject(IconInfo.hbmColor);
   }
 
-  BITMAPINFO* bi = (BITMAPINFO*)::malloc(sizeof(BITMAPINFOHEADER));
+  BMPINFO bmpinfo = {0};
 
   HBITMAP bitmap = NULL;
-
   {
     bitmap = CreateCompatibleBitmap(
       hScrDC, 
       screenrect.right - screenrect.left, 
       screenrect.bottom - screenrect.top);
 
-    bi->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bi->bmiHeader.biBitCount = 0;
+    bmpinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmpinfo.bmiHeader.biBitCount = 0;
 
-    int result = ::GetDIBits(hMemDC, bitmap, 0, 0, NULL, bi, DIB_RGB_COLORS);
+    int result = ::GetDIBits(hMemDC, bitmap, 0, 0, NULL, (LPBITMAPINFO)&bmpinfo, DIB_RGB_COLORS);
 
     if (!result)
       return;
 
-    if ((GetDeviceCaps(hMemDC, RASTERCAPS) & RC_PALETTE) == 0) {// Õæ²Ê
-      if (bi->bmiHeader.biBitCount == 32) {
-        bi = (BITMAPINFO*)::realloc(bi, sizeof(BITMAPINFOHEADER) +  3 * sizeof(RGBQUAD));
-      }
+    if ((GetDeviceCaps(hMemDC, RASTERCAPS) & RC_PALETTE) == 0) {//Õæ²Ê
+      assert(bmpinfo.bmiHeader.biBitCount == 32);
     }
 
-    result = ::GetDIBits(hMemDC, bitmap, 0, 0, NULL, bi, DIB_RGB_COLORS);
+    result = ::GetDIBits(hMemDC, bitmap, 0, 0, NULL, (LPBITMAPINFO)&bmpinfo, DIB_RGB_COLORS);
 
     if (!result)
       return;
@@ -86,7 +85,7 @@ void CaptureScreenToFile(const std::string& file_name) {
     DeleteObject(bitmap);
 
     bitmap = 
-      CreateDIBSection(hMemDC, bi, DIB_RGB_COLORS, (LPVOID*)&lpBitmapBits, NULL, 0);
+      CreateDIBSection(hMemDC, (LPBITMAPINFO)&bmpinfo, DIB_RGB_COLORS, (LPVOID*)&lpBitmapBits, NULL, 0);
   }
 
   HGDIOBJ oldbmp = ::SelectObject(hMemDC, bitmap); 
@@ -98,16 +97,12 @@ void CaptureScreenToFile(const std::string& file_name) {
   ::DrawIconEx(hMemDC, hCursorInfo.ptScreenPos.x, hCursorInfo.ptScreenPos.y, 
     hCursorInfo.hCursor, 0, 0, 0, NULL, DI_NORMAL );
 
-  SaveImgToFile(file_name,
-    screenrect.right - screenrect.left,
-    screenrect.bottom - screenrect.top,
-    bi->bmiHeader.biBitCount, lpBitmapBits);
+  SaveImgToFile(file_name, (LPBITMAPINFO)&bmpinfo, lpBitmapBits);
 
   ::SelectObject(hMemDC, oldbmp);
   ::DeleteObject(bitmap);
   ::DeleteObject(hMemDC);
   ::ReleaseDC(NULL, hScrDC);
-  ::free(bi);
 }
 
 UNIT_TEST(save_to_bmp) {
