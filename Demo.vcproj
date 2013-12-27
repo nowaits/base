@@ -197,6 +197,10 @@
 				RelativePath=".\demo\main.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\demo\save_to_bmp.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Í·ÎÄ¼þ"

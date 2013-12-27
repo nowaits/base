@@ -19,7 +19,7 @@ void SaveImgToFile(const std::string& file_name, int w, int h, int bit_count, co
   bh.bfSize = bh.bfOffBits + data_size;
 
   {
-   std::ofstream fs(file_name, std::ios::binary|std::ios::trunc);
+   std::ofstream fs(file_name.c_str(), std::ios::binary|std::ios::trunc);
    fs.write((const char*)&bh, sizeof(BITMAPFILEHEADER));
    fs.write((const char*)&(bi.bmiHeader), sizeof(BITMAPINFOHEADER));
    fs.write((const char*)bytes, data_size);
