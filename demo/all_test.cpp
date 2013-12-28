@@ -72,41 +72,63 @@ UNIT_TEST(referance_type) {
 class _log 
   : public std::stringstream{
 public:
-  _log(std::fstream& file_steam, bool force_to_file = false)
-    : file_steam_(file_steam), force_to_file_(force_to_file) {
-    SYSTEMTIME tm;
-    ::GetLocalTime(&tm);
-    logStream()<<"["<<tm.wHour<<":"<<tm.wMinute<<":"<<tm.wSecond<<"]:<";
-  }
+  enum direct_type {
+    to_file,
+    to_debug,
+    to_console
+  };
 
-  ~_log() {
-    logStream()<<std::endl;
+  _log(direct_type type = to_file);
 
-    if (force_to_file_ || 
-      ::IsDebuggerPresent() == FALSE) 
-      file_steam_<<str();
-    else
-      ::OutputDebugStringA(str().c_str());
-  }
+  ~_log();
 
-  std::iostream& logStream() {
-    return *this;
-  }
+  std::iostream& logStream();
 
 private:
+  direct_type     type_;
   bool            force_to_file_;
   std::fstream&   file_steam_;
-};
 
-std::fstream file_steam("SLOG.log", std::ios::trunc|std::ios::out);
+  static std::fstream file_steam;
+};
+//////////////////////////////////////////////////////////////////////////
+std::fstream _log::file_steam("SLOG.log", std::ios::trunc|std::ios::out);
+
+_log::_log(direct_type type)
+: file_steam_(file_steam), type_(type) {
+  SYSTEMTIME tm;
+  ::GetLocalTime(&tm);
+  logStream()<<"["<<tm.wHour<<":"<<tm.wMinute<<":"<<tm.wSecond<<"]:<";
+}
+
+_log::~_log() {
+  logStream()<<std::endl;
+
+  if (type_ == to_file) {
+    _log::file_steam<<str();
+  }
+  else if (type_ == to_debug) {
+    if (::IsDebuggerPresent())
+      ::OutputDebugStringA(str().c_str());
+  }
+  else if (type_ == to_console) {
+    std::cout<<str();
+  }
+}
+
+std::iostream& _log::logStream() {
+  return *this;
+}
 
 //////////////////////////////////////////////////////////////////////////
-#define SVLOG (_log(file_steam, true).logStream()<<__FUNCTION__<<":("<<__LINE__<<")>::")
+#define SFLOG (_log(_log::to_file).logStream()<<__FUNCTION__<<":("<<__LINE__<<")>::")
+#define SDLOG (_log(_log::to_debug).logStream()<<__FUNCTION__<<":("<<__LINE__<<")>::")
+#define SCLOG (_log(_log::to_console).logStream()<<__FUNCTION__<<":("<<__LINE__<<")>::")
 
-#define SLOG (_log(file_steam).logStream()<<__FUNCTION__<<":("<<__LINE__<<")>::")
 UNIT_TEST(SLOG) {
-  SLOG<<"hello";
-  SLOG<<"hellso";
+  SFLOG<<"hello";
+  SDLOG<<"hello";
+  SCLOG<<"hello";
 }
 
 //////////////////////////////////////////////////////////////////////////
