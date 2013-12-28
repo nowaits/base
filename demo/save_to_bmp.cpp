@@ -175,3 +175,35 @@ UNIT_TEST(save_to_bmp) {
 
   ::ReleaseDC(NULL, hScreen);
 }
+//////////////////////////////////////////////////////////////////////////
+
+void CentreWindow(HWND hwnd)
+{
+  RECT winrect, workrect;
+
+  // Find how large the desktop work area is
+  ::SystemParametersInfo(SPI_GETWORKAREA, 0, &workrect, 0);
+  int workwidth = workrect.right -  workrect.left;
+  int workheight = workrect.bottom - workrect.top;
+
+  // And how big the window is
+  ::GetWindowRect(hwnd, &winrect);
+  int winwidth = winrect.right - winrect.left;
+  int winheight = winrect.bottom - winrect.top;
+  // Make sure it's not bigger than the work area
+  winwidth = min(winwidth, workwidth);
+  winheight = min(winheight, workheight);
+
+  // Now centre it
+  ::SetWindowPos(hwnd, 
+    HWND_TOP,
+    workrect.left + (workwidth-winwidth) / 2,
+    workrect.top + (workheight-winheight) / 2,
+    winwidth, winheight, 
+    SWP_SHOWWINDOW);
+  ::SetForegroundWindow(hwnd);
+}
+
+UNIT_TEST(CentreWindow) {
+  CentreWindow(::GetForegroundWindow());
+}
