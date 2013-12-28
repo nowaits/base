@@ -68,11 +68,8 @@ bool CaptureScreenToFile(const std::string& file_name, HDC hScrDC = ::GetDC(NULL
 
   const unsigned char *lpBitmapBits = NULL; 
 
-  RECT screenrect;
-  screenrect.left		= GetSystemMetrics(SM_XVIRTUALSCREEN);
-  screenrect.top		= GetSystemMetrics(SM_YVIRTUALSCREEN);
-  screenrect.right	= screenrect.left + GetSystemMetrics(SM_CXVIRTUALSCREEN);
-  screenrect.bottom	= screenrect.top + GetSystemMetrics(SM_CYVIRTUALSCREEN);
+  int width  = ::GetDeviceCaps(hScrDC, HORZRES);
+  int height = ::GetDeviceCaps(hScrDC, VERTRES);
 
   hMemDC = ::CreateCompatibleDC(hScrDC); 
 
@@ -94,9 +91,7 @@ bool CaptureScreenToFile(const std::string& file_name, HDC hScrDC = ::GetDC(NULL
   HBITMAP bitmap = NULL;
   {
     bitmap = CreateCompatibleBitmap(
-      hScrDC, 
-      screenrect.right - screenrect.left, 
-      screenrect.bottom - screenrect.top);
+      hScrDC, width, height);
 
     bmpinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     bmpinfo.bmiHeader.biBitCount = 0;
@@ -123,9 +118,7 @@ bool CaptureScreenToFile(const std::string& file_name, HDC hScrDC = ::GetDC(NULL
 
   HGDIOBJ oldbmp = ::SelectObject(hMemDC, bitmap); 
 
-  ::BitBlt(hMemDC, 0, 0,
-    screenrect.right - screenrect.left,
-    screenrect.bottom - screenrect.top, 
+  ::BitBlt(hMemDC, 0, 0, width, height,
     hScrDC, 0, 0, SRCCOPY|CAPTUREBLT);
   ::DrawIconEx(hMemDC, hCursorInfo.ptScreenPos.x, hCursorInfo.ptScreenPos.y, 
     hCursorInfo.hCursor, 0, 0, 0, NULL, DI_NORMAL );
@@ -173,7 +166,7 @@ UNIT_TEST(save_to_bmp) {
   HBITMAP bitmap =
     CreateCompatibleBitmap(
       hScreen, 
-      1280, 800);
+      280, 800);
   HBITMAP old_bmp = (HBITMAP)::SelectObject(hMemDc, bitmap);
 
   assert(CaptureScreenToFile(file_name_a));
