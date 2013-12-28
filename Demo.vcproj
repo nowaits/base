@@ -182,6 +182,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\demo\alloc_console.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\demo\bind_weak_ptr_test.cc"
 				>
 			</File>
