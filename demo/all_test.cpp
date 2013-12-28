@@ -39,6 +39,7 @@
 #include "base\function_type\type.h"
 #include "base\sigslot.h"
 #include <fstream>
+#include <shlwapi.h>
 //////////////////////////////////////////////////////////////////////////
 void CALLBACK time_proc(HWND hwnd, UINT uMsg, UINT_PTR id, DWORD t) {
   ::PostMessage(NULL, WM_QUIT, 0, 0);
@@ -68,7 +69,7 @@ UNIT_TEST(referance_type) {
   assert(&x == &t.x_);
 }
 //////////////////////////////////////////////////////////////////////////
-
+#pragma comment(lib, "Shlwapi")
 class _log 
   : public std::stringstream{
 public:
@@ -87,25 +88,51 @@ public:
 private:
   direct_type     type_;
   bool            force_to_file_;
-  std::fstream&   file_steam_;
 
-  static std::fstream file_steam;
+  static std::auto_ptr<std::fstream> file_steam;
 };
 //////////////////////////////////////////////////////////////////////////
-std::fstream _log::file_steam("SLOG.log", std::ios::trunc|std::ios::out);
+//std::fstream _log::file_steam("getmodel.log", std::ios::trunc|std::ios::out);
 
-_log::_log(direct_type type)
-: file_steam_(file_steam), type_(type) {
+std::auto_ptr<std::fstream> _log::file_steam;
+
+_log::_log(direct_type type): type_(type) {
   SYSTEMTIME tm;
   ::GetLocalTime(&tm);
   logStream()<<"["<<tm.wHour<<":"<<tm.wMinute<<":"<<tm.wSecond<<"]:<";
+
+  if (type == to_file && !file_steam.get()) {
+    std::string file_name;
+    file_name.resize(MAX_PATH);
+
+    do {
+      bool hr = 
+        ::GetModuleFileNameA(NULL,
+        const_cast<char*>(file_name.data()), file_name.size()) != 0;
+
+      if (!hr)
+        break;
+
+      hr = 
+        ::PathRenameExtensionA(const_cast<char*>(file_name.data()), ".log") != 0;
+
+      if (!hr)
+        break;
+
+      file_name = ::PathFindFileNameA(const_cast<char*>(file_name.data()));
+
+      _log::file_steam.reset(
+        new std::fstream(file_name.c_str(), std::ios::trunc|std::ios::out));
+    }while(false);
+  }
 }
 
 _log::~_log() {
   logStream()<<std::endl;
 
   if (type_ == to_file) {
-    _log::file_steam<<str();
+    if (_log::file_steam.get())
+      *_log::file_steam<<str();
   }
   else if (type_ == to_debug) {
     if (::IsDebuggerPresent())
