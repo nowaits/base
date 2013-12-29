@@ -41,6 +41,59 @@
 #include <fstream>
 #include <shlwapi.h>
 //////////////////////////////////////////////////////////////////////////
+const std::wstring ToUtf16(const std::string& str) {
+  std::wstring result;
+  int len16 = ::MultiByteToWideChar(CP_UTF8, 0, str.data(), str.length(),
+    NULL, 0);
+ 
+  result.resize(len16);
+  ::MultiByteToWideChar(CP_UTF8, 0, str.data(), str.length(), &result[0], len16);
+  return result;
+}
+
+const std::string ToUtf8(const std::wstring& wstr) {
+  std::string result;
+  int len8 = ::WideCharToMultiByte(CP_UTF8, 0, wstr.data(), wstr.length(),
+    NULL, 0, NULL, NULL);
+
+  result.resize(len8);
+  ::WideCharToMultiByte(CP_UTF8, 0, wstr.data(), wstr.length(),
+    &result[0], len8, NULL, NULL);
+  return result;
+}
+
+const std::wstring ToAnsi16(const std::string& str) {
+  std::wstring result;
+  int len16 = ::MultiByteToWideChar(CP_ACP, 0, str.data(), str.length(),
+    NULL, 0);
+
+  result.resize(len16);
+  ::MultiByteToWideChar(CP_ACP, 0, str.data(), str.length(), &result[0], len16);
+  return result;
+}
+
+const std::string ToAnsi8(const std::wstring& wstr) {
+  std::string result;
+  int len8 = ::WideCharToMultiByte(CP_ACP, 0, wstr.data(), wstr.length(),
+    NULL, 0, NULL, NULL);
+
+  result.resize(len8);
+  ::WideCharToMultiByte(CP_ACP, 0, wstr.data(), wstr.length(),
+    &result[0], len8, NULL, NULL);
+  return result;
+}
+
+UNIT_TEST(WideCharToMultiByte) {
+
+  std::wstring a = L"wÄãºÃdfsf";
+  std::string b = "wÄãºÃdfsf";
+
+  std::cout<<ToUtf8(a)<<std::endl;
+  std::wcout<<ToUtf16(b)<<std::endl;
+  std::cout<<ToAnsi8(a)<<std::endl;
+  std::wcout<<ToAnsi16(b)<<std::endl;
+}
+//////////////////////////////////////////////////////////////////////////
 void CALLBACK time_proc(HWND hwnd, UINT uMsg, UINT_PTR id, DWORD t) {
   ::PostMessage(NULL, WM_QUIT, 0, 0);
 }
