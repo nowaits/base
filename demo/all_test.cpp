@@ -71,7 +71,7 @@ UNIT_TEST(referance_type) {
 //////////////////////////////////////////////////////////////////////////
 #pragma comment(lib, "Shlwapi")
 class _log 
-  : public std::stringstream{
+  : public std::stringstream {
 public:
   enum direct_type {
     to_file,
@@ -84,7 +84,8 @@ public:
   ~_log();
 
   std::iostream& logStream();
-
+  void _Add_vtordisp1() { } // Required to avoid VC++ warning C4250
+  void _Add_vtordisp2() { } // Required to avoid VC++ warning C4250
 private:
   direct_type     type_;
   bool            force_to_file_;
