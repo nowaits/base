@@ -211,7 +211,7 @@ UNIT_TEST(save_to_bmp) {
   int width, height;
 
   assert(::GetCursorPos(&point) != FALSE);
-  HWND hwnd = ::WindowFromPoint(point);
+  HWND hwnd = ::GetAncestor(::WindowFromPoint(point), GA_ROOT);
 
   HDC hScreen = ::GetWindowDC(hwnd);
   assert(GetDCSize(hScreen, width, height));
