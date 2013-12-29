@@ -62,14 +62,32 @@ bool LoadBmp(const std::string& file_name, BITMAPFILEHEADER& bh,
    return true;
 }
 
+bool GetDCSize(HDC dc, int& width, int& height) {
+  HBITMAP hBitmap = (HBITMAP)GetCurrentObject(dc, OBJ_BITMAP);
+
+  if (!hBitmap)
+    return false;
+
+  BITMAP bitmaps = {0};
+  if (::GetObject(hBitmap, sizeof(BITMAP), &bitmaps) == 0)
+    return false;
+
+  width  = bitmaps.bmWidth;
+  height = bitmaps.bmHeight;
+  return true;
+}
+
 bool CaptureScreenToFile(const std::string& file_name, HDC hScrDC = ::GetDC(NULL)) {
   ::GdiFlush();
   HDC hMemDC = NULL;
 
   const unsigned char *lpBitmapBits = NULL; 
 
-  int width  = ::GetDeviceCaps(hScrDC, HORZRES);
-  int height = ::GetDeviceCaps(hScrDC, VERTRES);
+  int width  = 0;
+  int height = 0;
+
+  if (!GetDCSize(hScrDC, width, height))
+    return false;
 
   hMemDC = ::CreateCompatibleDC(hScrDC); 
 
@@ -128,7 +146,6 @@ bool CaptureScreenToFile(const std::string& file_name, HDC hScrDC = ::GetDC(NULL
   ::SelectObject(hMemDC, oldbmp);
   ::DeleteObject(bitmap);
   ::DeleteObject(hMemDC);
-  ::ReleaseDC(NULL, hScrDC);
 
   return true;
 }
@@ -160,20 +177,29 @@ bool SetDIBToSdevice(HDC dc, const std::string& file_name) {
 UNIT_TEST(save_to_bmp) {
   std::string file_name_a = "c:\\a.bmp";
   std::string file_name_b = "c:\\b.bmp";
-  HDC hScreen = ::GetDC(NULL);
-  HDC hMemDc = CreateCompatibleDC(hScreen);
+ 
+  POINT point = {0};
+  int width, height;
+
+  assert(::GetCursorPos(&point) != FALSE);
+  HWND hwnd = ::WindowFromPoint(point);
+
+  HDC hScreen = ::GetDC(hwnd);
+  assert(GetDCSize(hScreen, width, height));
+
+  HDC hMemDc = ::CreateCompatibleDC(hScreen);
 
   HBITMAP bitmap =
-    CreateCompatibleBitmap(
-      hScreen, 
-      280, 800);
+    ::CreateCompatibleBitmap(
+    hScreen, 
+    width, height);
   HBITMAP old_bmp = (HBITMAP)::SelectObject(hMemDc, bitmap);
 
-  assert(CaptureScreenToFile(file_name_a));
+  assert(CaptureScreenToFile(file_name_a, hScreen));
   assert(SetDIBToSdevice(hMemDc, file_name_a));
   assert(CaptureScreenToFile(file_name_b, hMemDc));
 
-  ::ReleaseDC(NULL, hScreen);
+  ::ReleaseDC(hwnd, hScreen);
 }
 //////////////////////////////////////////////////////////////////////////
 
