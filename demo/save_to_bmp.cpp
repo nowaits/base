@@ -63,22 +63,37 @@ bool LoadBmp(const std::string& file_name, BITMAPFILEHEADER& bh,
 }
 
 bool GetDCSize(HDC dc, int& width, int& height) {
-  HBITMAP hBitmap = (HBITMAP)GetCurrentObject(dc, OBJ_BITMAP);
 
-  if (!hBitmap)
-    return false;
+  do {
+    HBITMAP hBitmap = (HBITMAP)::GetCurrentObject(dc, OBJ_BITMAP);
+    if (!hBitmap)
+      return false;
 
-  BITMAP bitmaps = {0};
-  if (::GetObject(hBitmap, sizeof(BITMAP), &bitmaps) == 0)
-    return false;
+    BITMAP bitmaps = {0};
+    if (::GetObject(hBitmap, sizeof(BITMAP), &bitmaps) != 0) {
+      // layer窗口会失败
+      width  = bitmaps.bmWidth;
+      height = bitmaps.bmHeight;
+      break;
+    }
 
-  width  = bitmaps.bmWidth;
-  height = bitmaps.bmHeight;
+    HWND hwnd = ::WindowFromDC(dc);
+
+    if (hwnd == NULL || 
+      (::GetWindowLong(hwnd, GWL_EXSTYLE) & WS_EX_LAYERED) == 0)
+      return false;
+
+    RECT rc = {0};
+    if (::GetWindowRect(hwnd, &rc) == FALSE)
+      return false;
+
+    width  = rc.right - rc.left;
+    height = rc.bottom - rc.top;
+  }while (false);
   return true;
 }
 
 bool CaptureScreenToFile(const std::string& file_name, HDC hScrDC = ::GetDC(NULL)) {
-  ::GdiFlush();
   HDC hMemDC = NULL;
 
   const unsigned char *lpBitmapBits = NULL; 
@@ -92,16 +107,16 @@ bool CaptureScreenToFile(const std::string& file_name, HDC hScrDC = ::GetDC(NULL
   hMemDC = ::CreateCompatibleDC(hScrDC); 
 
   CURSORINFO hCursorInfo = {sizeof(CURSORINFO), 0, 0, 0};
-  GetCursorInfo(&hCursorInfo);
+  ::GetCursorInfo(&hCursorInfo);
   ICONINFO IconInfo = {0};
-  if(GetIconInfo(hCursorInfo.hCursor, &IconInfo))
+  if(::GetIconInfo(hCursorInfo.hCursor, &IconInfo))
   {
     hCursorInfo.ptScreenPos.x -= IconInfo.xHotspot;
     hCursorInfo.ptScreenPos.y -= IconInfo.yHotspot;
     if(NULL != IconInfo.hbmMask)
-      DeleteObject(IconInfo.hbmMask);
+      ::DeleteObject(IconInfo.hbmMask);
     if(NULL != IconInfo.hbmColor)
-      DeleteObject(IconInfo.hbmColor);
+      ::DeleteObject(IconInfo.hbmColor);
   }
 
   BMPINFO bmpinfo = {0};
@@ -119,7 +134,7 @@ bool CaptureScreenToFile(const std::string& file_name, HDC hScrDC = ::GetDC(NULL
     if (!result)
       return false;
 
-    if ((GetDeviceCaps(hMemDC, RASTERCAPS) & RC_PALETTE) == 0) {//真彩
+    if ((::GetDeviceCaps(hMemDC, RASTERCAPS) & RC_PALETTE) == 0) {//真彩
       assert(bmpinfo.bmiHeader.biBitCount == 32);
     }
 
@@ -128,16 +143,30 @@ bool CaptureScreenToFile(const std::string& file_name, HDC hScrDC = ::GetDC(NULL
     if (!result)
       return false;
 
-    DeleteObject(bitmap);
+    ::DeleteObject(bitmap);
 
     bitmap = 
-      CreateDIBSection(hMemDC, (LPBITMAPINFO)&bmpinfo, DIB_RGB_COLORS, (LPVOID*)&lpBitmapBits, NULL, 0);
+      ::CreateDIBSection(hMemDC, (LPBITMAPINFO)&bmpinfo, DIB_RGB_COLORS, (LPVOID*)&lpBitmapBits, NULL, 0);
   }
 
   HGDIOBJ oldbmp = ::SelectObject(hMemDC, bitmap); 
 
-  ::BitBlt(hMemDC, 0, 0, width, height,
+#if 1
+  HWND h = ::WindowFromDC(hScrDC);
+  if (h != NULL && (::GetWindowLong(h, GWL_EXSTYLE) & WS_EX_LAYERED))
+    ::PrintWindow(h, hMemDC, 0);// layered窗体透明度没法得到
+  else
+    ::BitBlt(hMemDC, 0, 0, width, height,
     hScrDC, 0, 0, SRCCOPY|CAPTUREBLT);
+#else
+  BLENDFUNCTION bf = {0};
+  bf.BlendOp = AC_SRC_OVER;
+  bf.BlendFlags = 0;
+  bf.AlphaFormat = 0;
+  bf.SourceConstantAlpha = 255;
+
+  ::AlphaBlend(hMemDC, 0, 0, width, height, hScrDC, 0, 0, width, height, bf);
+#endif
   ::DrawIconEx(hMemDC, hCursorInfo.ptScreenPos.x, hCursorInfo.ptScreenPos.y, 
     hCursorInfo.hCursor, 0, 0, 0, NULL, DI_NORMAL );
 
