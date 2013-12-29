@@ -184,7 +184,7 @@ UNIT_TEST(save_to_bmp) {
   assert(::GetCursorPos(&point) != FALSE);
   HWND hwnd = ::WindowFromPoint(point);
 
-  HDC hScreen = ::GetDC(hwnd);
+  HDC hScreen = ::GetWindowDC(hwnd);
   assert(GetDCSize(hScreen, width, height));
 
   HDC hMemDc = ::CreateCompatibleDC(hScreen);
