@@ -1,3 +1,8 @@
+// UNIT_TEST(WideCharToMultiByte)
+// UNIT_TEST(time_proc)
+// UNIT_TEST(SLOG)
+// UNIT_TEST(CircularBuffer)
+// UNIT_TEST(g_buildTime)
 // UNIT_TEST(VNCSigslotTest)
 // UNIT_TEST(postfix)
 // UNIT_TEST(placement_new)
