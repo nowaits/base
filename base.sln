@@ -1,12 +1,9 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "base", "base.vcproj", "{6647E1BE-873A-4CA0-9740-6C68F0E04214}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "base", "base.vcxproj", "{6647E1BE-873A-4CA0-9740-6C68F0E04214}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Demo", "Demo.vcproj", "{AE12B8A8-23AE-403D-B77E-7F5942385D02}"
-	ProjectSection(ProjectDependencies) = postProject
-		{6647E1BE-873A-4CA0-9740-6C68F0E04214} = {6647E1BE-873A-4CA0-9740-6C68F0E04214}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Demo", "Demo.vcxproj", "{AE12B8A8-23AE-403D-B77E-7F5942385D02}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
