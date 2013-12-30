@@ -3,6 +3,7 @@
 #include "base\test\unit_test.h"
 #include <fstream>
 #include <assert.h>
+#include "base\third\png_codec.h"
 
 struct BMPINFO{
   BITMAPINFOHEADER    bmiHeader;
@@ -20,11 +21,15 @@ void SaveImgToFile(const std::string& file_name, BITMAPINFO* lpbi, const unsigne
   bh.bfSize = bh.bfOffBits + data_size;
 
   {
+    SkBitmap bmp;
+    bmp.bitmap_header = lpbi->bmiHeader;
+    bmp.lpBits = const_cast<unsigned char*>(bytes);
+
+    std::vector<unsigned char> v;
+    PNGCodec::EncodeBGRASkBitmap(bmp, false, &v);
+
     std::ofstream fs(file_name.c_str(), std::ios::binary|std::ios::trunc);
-    fs.write((const char*)&bh, sizeof(BITMAPFILEHEADER));
-    fs.write((const char*)(lpbi),
-      sizeof(BITMAPINFOHEADER) + 256 * sizeof(RGBQUAD));
-    fs.write((const char*)bytes, data_size);
+    fs.write((const char*)&v[0], v.size());
   }
 }
 
@@ -230,8 +235,8 @@ bool SetDIBToSdevice(HDC dc, const std::string& file_name) {
 }
 
 UNIT_TEST(save_to_bmp) {
-  std::string file_name_a = "c:\\a.bmp";
-  std::string file_name_b = "c:\\b.bmp";
+  std::string file_name_a = "c:\\a.png";
+  std::string file_name_b = "c:\\b.png";
  
   POINT point = {0};
   int width, height;

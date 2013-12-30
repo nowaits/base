@@ -1,11 +1,18 @@
-// Copyright (c) 2011 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 #pragma once
 
 #include <string>
 #include <vector>
+#include <Windows.h>
+
+struct SkBitmap{
+  BITMAPINFOHEADER     bitmap_header;
+  unsigned char* lpBits;
+
+  int width(){return bitmap_header.biWidth;}
+  int height(){return bitmap_header.biHeight;}
+  unsigned char* data(){return lpBits;}
+  void setIsOpaque(bool){}
+};
 
 // Interface for encoding and decoding PNG data. This is a wrapper around
 // libpng, which has an inconvenient interface for callers. This is currently
@@ -15,23 +22,6 @@
 // things, partially downloaded data.
 class PNGCodec {
  public:
-  enum ColorFormat {
-    // 3 bytes per pixel (packed), in RGB order regardless of endianness.
-    // This is the native JPEG format.
-    FORMAT_RGB,
-
-    // 4 bytes per pixel, in RGBA order in memory regardless of endianness.
-    FORMAT_RGBA,
-
-    // 4 bytes per pixel, in BGRA order in memory regardless of endianness.
-    // This is the default Windows DIB order.
-    FORMAT_BGRA,
-
-    // 4 bytes per pixel, in pre-multiplied kARGB_8888_Config format. For use
-    // with directly writing to a skia bitmap.
-    FORMAT_SkBitmap
-  };
-
   // Represents a comment in the tEXt ancillary chunk of the png.
   struct Comment {
     Comment(const std::string& k, const std::string& t);
@@ -44,8 +34,7 @@ class PNGCodec {
   // Calls PNGCodec::EncodeWithCompressionLevel with the default compression
   // level.
   static bool Encode(const unsigned char* input,
-                     ColorFormat format,
-                     const Size& size,
+                     const SIZE& size,
                      int row_byte_width,
                      bool discard_transparency,
                      const std::vector<Comment>& comments,
@@ -71,8 +60,7 @@ class PNGCodec {
   // compression_level: An integer between -1 and 9, corresponding to zlib's
   //   compression levels. -1 is the default.
   static bool EncodeWithCompressionLevel(const unsigned char* input,
-                                         ColorFormat format,
-                                         const Size& size,
+                                         const SIZE& size,
                                          int row_byte_width,
                                          bool discard_transparency,
                                          const std::vector<Comment>& comments,
@@ -83,7 +71,7 @@ class PNGCodec {
   // to be BGRA, 32 bits per pixel. The params |discard_transparency| and
   // |output| are passed directly to Encode; refer to Encode for more
   // information. During the call, an SkAutoLockPixels lock is held on |input|.
-  static bool EncodeBGRASkBitmap(const SkBitmap& input,
+  static bool EncodeBGRASkBitmap(SkBitmap& input,
                                  bool discard_transparency,
                                  std::vector<unsigned char>* output);
 
@@ -96,7 +84,7 @@ class PNGCodec {
   // with a large number of images, so assume a new format may not work. It's
   // really designed to be able to read in something written by Encode() above.
   static bool Decode(const unsigned char* input, size_t input_size,
-                     ColorFormat format, std::vector<unsigned char>* output,
+                     std::vector<unsigned char>* output,
                      int* w, int* h);
 
   // Decodes the PNG data directly into the passed in SkBitmap. This is
