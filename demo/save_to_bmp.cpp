@@ -4,6 +4,7 @@
 #include <fstream>
 #include <assert.h>
 #include "base\third\png_codec.h"
+#include <shlwapi.h>
 
 struct BMPINFO{
   BITMAPINFOHEADER    bmiHeader;
@@ -21,15 +22,26 @@ void SaveImgToFile(const std::string& file_name, BITMAPINFO* lpbi, const unsigne
   bh.bfSize = bh.bfOffBits + data_size;
 
   {
-    SkBitmap bmp;
-    bmp.bitmap_header = lpbi->bmiHeader;
-    bmp.lpBits = const_cast<unsigned char*>(bytes);
-
-    std::vector<unsigned char> v;
-    PNGCodec::EncodeBGRASkBitmap(bmp, false, &v);
-
     std::ofstream fs(file_name.c_str(), std::ios::binary|std::ios::trunc);
-    fs.write((const char*)&v[0], v.size());
+
+    const char* extension_name = 
+        ::PathFindExtensionA(file_name.c_str());
+
+    if (extension_name && std::string(".png") == extension_name) {
+      SkBitmap bmp;
+      bmp.bitmap_header = lpbi->bmiHeader;
+      bmp.lpBits = const_cast<unsigned char*>(bytes);
+
+      std::vector<unsigned char> v;
+      PNGCodec::EncodeBGRASkBitmap(bmp, false, &v);
+      fs.write((const char*)&v[0], v.size());
+    }
+    else {
+      fs.write((const char*)&bh, sizeof(BITMAPFILEHEADER));
+      fs.write((const char*)(lpbi),
+        sizeof(BITMAPINFOHEADER) + 256 * sizeof(RGBQUAD));
+      fs.write((const char*)bytes, data_size);
+    }
   }
 }
 
@@ -104,13 +116,12 @@ bool MakeOpaqe(BITMAPINFO* lpbi, const unsigned char* bytes) {
 
   unsigned long row_bytes     = (lpbi->bmiHeader.biWidth << 2);
   unsigned long alpha_chanel  = (0xff<<24);
-  unsigned long alpha_chanel_mask  = ~alpha_chanel;
 
   for(int i = 0; i < lpbi->bmiHeader.biHeight; i ++) {
     unsigned long* lp_row = (unsigned long*)(bytes + row_bytes * i);
 
     for(int j = 0; j < lpbi->bmiHeader.biWidth; j ++)
-      lp_row[j]&=alpha_chanel_mask;
+      lp_row[j]|=alpha_chanel;
   }
   return true;
 }
@@ -179,15 +190,16 @@ bool CaptureScreenToFile(const std::string& file_name, HDC hScrDC = ::GetDC(NULL
   if (::IsWindow(h) == TRUE && 
     ((ex_style = ::GetWindowLong(h, GWL_EXSTYLE)) & WS_EX_LAYERED)) {
     ::SetLayeredWindowAttributes(h, RGB(0, 0, 0), 0xFF, LWA_ALPHA|LWA_COLORKEY);
-   // ::RedrawWindow(h, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
     ::PrintWindow(h, hMemDC, 0);
     ::SetWindowLong(h, GWL_EXSTYLE, ex_style&(~WS_EX_LAYERED));
     ::SetWindowLong(h, GWL_EXSTYLE, ex_style);
     ::RedrawWindow(h, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
   }
-  else
+  else {
     ::BitBlt(hMemDC, 0, 0, width, height,
     hScrDC, 0, 0, SRCCOPY|CAPTUREBLT);
+    MakeOpaqe((LPBITMAPINFO)&bmpinfo, lpBitmapBits);
+  }
 #else
   BLENDFUNCTION bf = {0};
   bf.BlendOp = AC_SRC_OVER;
@@ -196,11 +208,11 @@ bool CaptureScreenToFile(const std::string& file_name, HDC hScrDC = ::GetDC(NULL
   bf.SourceConstantAlpha = 255;
 
   ::AlphaBlend(hMemDC, 0, 0, width, height, hScrDC, 0, 0, width, height, bf);
-#endif
+
   ::DrawIconEx(hMemDC, hCursorInfo.ptScreenPos.x, hCursorInfo.ptScreenPos.y, 
     hCursorInfo.hCursor, 0, 0, 0, NULL, DI_NORMAL );
-
-//  MakeOpaqe((LPBITMAPINFO)&bmpinfo, lpBitmapBits);
+#endif
+  
   SaveImgToFile(file_name, (LPBITMAPINFO)&bmpinfo, lpBitmapBits);
 
   ::SelectObject(hMemDC, oldbmp);
@@ -244,7 +256,7 @@ UNIT_TEST(save_to_bmp) {
   assert(::GetCursorPos(&point) != FALSE);
   HWND hwnd = ::GetAncestor(::WindowFromPoint(point), GA_ROOT);
 
-  HDC hScreen = ::GetDC(hwnd);
+  HDC hScreen = ::GetWindowDC(hwnd);
   assert(GetDCSize(hScreen, width, height));
 
   HDC hMemDc = ::CreateCompatibleDC(hScreen);

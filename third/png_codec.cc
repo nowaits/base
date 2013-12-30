@@ -1,13 +1,10 @@
 #include "png_codec.h"
-
 #include <assert.h>
+#pragma comment(lib, "E:\\svn\\base\\build\\Debug\\libpng")
 extern "C" {
 #include <base\libpng\png.h>
 #include <base\zlib\zlib.h>
 }
-
-#include <string.h>
-
 
 // Decoder --------------------------------------------------------------------
 //
@@ -18,6 +15,21 @@ extern "C" {
 const double kMaxGamma = 21474.83;  // Maximum gamma accepted by png library.
 const double kDefaultGamma = 2.2;
 const double kInverseGamma = 1.0 / kDefaultGamma;
+
+// Converts BGRA->RGBA and RGBA->BGRA.
+void ConvertBetweenBGRAandRGBA(const unsigned char* input, int pixel_width,
+                               unsigned char* output, bool* is_opaque)
+{
+  for(int x=0; x<pixel_width; ++x)
+  {
+    const unsigned char* pixel_in = &input[x * 4];
+    unsigned char* pixel_out = &output[x * 4];
+    pixel_out[0] = pixel_in[2];
+    pixel_out[1] = pixel_in[1];
+    pixel_out[2] = pixel_in[0];
+    pixel_out[3] = pixel_in[3];
+  }
+}
 
 class PngDecoderState {
  public:
@@ -460,13 +472,13 @@ bool DoLibpngWrite(png_struct* png_ptr, png_info* info_ptr,
     // No conversion needed, give the data directly to libpng.
     for (int y = 0; y < height; y ++) {
       png_write_row(png_ptr,
-                    const_cast<unsigned char*>(&input[y * row_byte_width]));
+                    const_cast<unsigned char*>(&input[(height - 1 - y) * row_byte_width]));
     }
   } else {
     // Needs conversion using a separate buffer.
     unsigned char* row = new unsigned char[width * output_color_components];
     for (int y = 0; y < height; y ++) {
-      converter(&input[y * row_byte_width], width, row, NULL);
+      converter(&input[(height - 1 - y) * row_byte_width], width, row, NULL);
       png_write_row(png_ptr, row);
     }
     delete[] row;
@@ -507,7 +519,7 @@ bool PNGCodec::EncodeWithCompressionLevel(const unsigned char* input,
   int png_output_color_type;
   output_color_components = 4;
   png_output_color_type = PNG_COLOR_TYPE_RGB_ALPHA;
-  converter = NULL;
+  converter = ConvertBetweenBGRAandRGBA;
 
   // Row stride should be at least as long as the length of the data.
   assert(output_color_components * size.cx <= row_byte_width);

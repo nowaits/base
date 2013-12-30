@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".."
+				AdditionalIncludeDirectories="..;..\base\zlib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -253,6 +253,14 @@
 			</File>
 			<File
 				RelativePath=".\third\circularbuffer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\third\png_codec.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\third\png_codec.h"
 				>
 			</File>
 		</Filter>
