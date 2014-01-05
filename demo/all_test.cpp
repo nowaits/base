@@ -46,6 +46,36 @@
 #include <fstream>
 #include <shlwapi.h>
 //////////////////////////////////////////////////////////////////////////
+class BaseHelper {
+  virtual void fun() {};
+};
+class BaseHelperA : public virtual BaseHelper {
+  virtual void fun() {};
+};
+
+class BaseHelperB : public virtual BaseHelper {
+};
+
+#pragma warning( push )
+#pragma warning(disable: 4250)
+class FinalHelper: public BaseHelperA , public BaseHelperB {
+};
+#pragma warning(pop)
+
+#pragma warning( push )
+#pragma warning(disable: 4250)
+class FinalHelpers: public FinalHelper {
+public:
+  FinalHelpers() {
+
+  }
+};
+#pragma warning(pop)
+
+//  class anyClass : public FinalHelpers {
+//  
+//  };
+//////////////////////////////////////////////////////////////////////////
 const std::wstring ToUtf16(const std::string& str) {
   std::wstring result;
   int len16 = ::MultiByteToWideChar(CP_UTF8, 0, str.data(), str.length(),
