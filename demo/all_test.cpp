@@ -45,6 +45,8 @@
 #include "base\sigslot.h"
 #include <fstream>
 #include <shlwapi.h>
+#include <locale>
+#include <algorithm>
 //////////////////////////////////////////////////////////////////////////
 class BaseHelper {
   virtual void fun() {};
@@ -142,6 +144,7 @@ UNIT_TEST(readfile) {
     ifs>>str1;
     str1.push_back(' ');
    
+    std::transform(str1.begin(), str1.end(), str1.begin(), ::tolower);
     std::cout<<ToAnsi8(str1);
     if (ifs.peek() == '\n')
       std::cout<<std::endl;
