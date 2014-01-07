@@ -95,14 +95,14 @@ bool convertFromString(T& value, const std::string &s) {
   return s == check;
 }
 
-void StringToList(const std::string & s, std::list<std::string>& list) {
+void StringToList(const std::string & s, std::vector<std::string>& v) {
   std::stringstream ss(s);
 
   while(!ss.eof()) {
-    std::string element;
-    ss>>element;
-    if (!element.empty())
-      list.push_back(element);
+    std::string e;
+    ss>>e;
+    if (!e.empty())
+      v.push_back(e);
   }
 }
 
