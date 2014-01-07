@@ -95,6 +95,17 @@ bool convertFromString(T& value, const std::string &s) {
   return s == check;
 }
 
+void StringToList(const std::string & s, std::list<std::string>& list) {
+  std::stringstream ss(s);
+
+  while(!ss.eof()) {
+    std::string element;
+    ss>>element;
+    if (!element.empty())
+      list.push_back(element);
+  }
+}
+
 const std::wstring ToUtf16(const std::string& str) {
   std::wstring result;
   int len16 = ::MultiByteToWideChar(CP_UTF8, 0, str.data(), str.length(),
@@ -149,6 +160,9 @@ UNIT_TEST(WideCharToMultiByte) {
   std::wcout<<ToUtf16(b)<<std::endl;
   std::cout<<ToAnsi8(a)<<std::endl;
   std::wcout<<ToAnsi16(b)<<std::endl;
+
+  std::list<std::string> list;
+  StringToList("esldfj   lkjlkj ff   ", list);
 }
 //////////////////////////////////////////////////////////////////////////
 UNIT_TEST(readfile) {
