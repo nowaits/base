@@ -79,16 +79,20 @@ public:
 //  };
 //////////////////////////////////////////////////////////////////////////
 template <class T> 
-const std::string convertToString(const T &value, std::string &s) {
+void convertToString(const T &value, std::string &s) {
   std::stringstream ss;
   ss << value;
   s = ss.str();
 }
 
 template <class T> 
-void convertFromString(T& value, const std::string &s) {
+bool convertFromString(T& value, const std::string &s) {
   std::stringstream ss(s);
   ss >> value;
+
+  std::string check;
+  convertToString(value, check);
+  return s == check;
 }
 
 const std::wstring ToUtf16(const std::string& str) {
@@ -134,7 +138,10 @@ const std::string ToAnsi8(const std::wstring& wstr) {
 }
 
 UNIT_TEST(WideCharToMultiByte) {
+  double fs ;
 
+  bool s = convertFromString(fs, "0.32fa");
+  bool sb = convertFromString(fs, "0.32");
   std::wstring a = L"wÄãºÃdfsf";
   std::string b = "wÄãºÃdfsf";
 
