@@ -129,6 +129,25 @@ UNIT_TEST(WideCharToMultiByte) {
   std::wcout<<ToAnsi16(b)<<std::endl;
 }
 //////////////////////////////////////////////////////////////////////////
+UNIT_TEST(readfile) {
+  std::wifstream ifs(L"C:/test.cpp");
+  // ifs.exceptions( std::wifstream::eofbit | std::wifstream::failbit | std::ifstream::badbit );  
+
+  if (!ifs.is_open())
+    return;
+  std::wstringstream str;
+  std::wstring str1;
+
+  while(!ifs.eof()) {
+    ifs>>str1;
+    str1.push_back(' ');
+   
+    std::cout<<ToAnsi8(str1);
+    if (ifs.peek() == '\n')
+      std::cout<<std::endl;
+  }
+}
+//////////////////////////////////////////////////////////////////////////
 void CALLBACK time_proc(HWND hwnd, UINT uMsg, UINT_PTR id, DWORD t) {
   ::PostMessage(NULL, WM_QUIT, 0, 0);
 }
