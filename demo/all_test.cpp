@@ -78,6 +78,19 @@ public:
 //  
 //  };
 //////////////////////////////////////////////////////////////////////////
+template <class T> 
+const std::string convertToString(const T &value, std::string &s) {
+  std::stringstream ss;
+  ss << value;
+  s = ss.str();
+}
+
+template <class T> 
+void convertFromString(T& value, const std::string &s) {
+  std::stringstream ss(s);
+  ss >> value;
+}
+
 const std::wstring ToUtf16(const std::string& str) {
   std::wstring result;
   int len16 = ::MultiByteToWideChar(CP_UTF8, 0, str.data(), str.length(),
